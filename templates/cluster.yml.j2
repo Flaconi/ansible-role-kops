@@ -1,0 +1,73 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  creationTimestamp: null
+  name: {{ cluster.name }}
+spec:
+  api:
+    loadBalancer:
+      type: Public
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://{{ cluster.s3_bucket_name | default(cluster.name | regex_search('^([-_a-zA-Z0-9]+)\.', '\\1') | first + '-state-store') }}/{{ cluster.name }}
+  docker:
+    insecureRegistry: 100.64.0.0/10
+    logDriver: ""
+  etcdClusters:
+    - etcdMembers:
+{% for subnet in kops_private_subnets %}
+      - instanceGroup: master-{{ subnet.availability_zone }}
+        name: {{ subnet.availability_zone | regex_search('(.?)$', '\\1') | first }}
+{% endfor %}
+      name: main
+    - etcdMembers:
+{% for subnet in kops_private_subnets %}
+      - instanceGroup: master-{{ subnet.availability_zone }}
+        name: {{ subnet.availability_zone | regex_search('(.?)$', '\\1') | first }}
+{% endfor %}
+      name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubernetesApiAccess:
+{% for ip in cluster.api_access | default(kops_default_api_access) %}
+    - {{ ip }}
+{% endfor %}
+  kubernetesVersion: {{ cluster.version | default(kops_default_version) }}
+  masterPublicName: api.{{ cluster.name }}
+  networkCIDR: {{ kops_vpc_cidr }}
+  networkID: {{ kops_vpc_id }}
+  networking:
+    # https://github.com/kubernetes/kops/blob/master/docs/networking.md#enable-cross-subnet-mode-in-calico-aws-only
+    #calico: {}
+    calico:
+      crossSubnet: true
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+{% for ip in cluster.ssh_access | default(kops_default_ssh_access) %}
+    - {{ ip }}
+{% endfor %}
+  subnets:
+{% for subnet in kops_private_subnets %}
+    - cidr: {{ subnet.cidr_block }}
+	  id: {{ subnet.id }}
+	  name: {{ subnet.availability_zone }}
+	  type: Private
+	  zone: {{ subnet.availability_zone }}
+{% endfor %}
+{% for subnet in kops_utility_subnets %}
+    - cidr: {{ subnet.cidr_block }}
+	  id: {{ subnet.id }}
+	  name: utility-{{ subnet.availability_zone }}
+	  type: Utility
+	  zone: {{ subnet.availability_zone }}
+{% endfor %}
+  topology:
+#    bastion:
+#      bastionPublicName: bastion.{{ cluster.name }}
+    dns:
+      type: Public
+    masters: private
+    nodes: private

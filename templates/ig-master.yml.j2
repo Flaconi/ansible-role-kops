@@ -1,0 +1,23 @@
+{% for subnet in kops_private_subnets %}
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{ cluster.name }}
+  name: master-{{ subnet.availability_zone }}
+spec:
+  image: {{ cluster.image | default(kops_default_image) }}
+  machineType: {% if 'masters' in cluster and 'instance_type' in cluster.masters %}{{ cluster.masters.instance_type }}{% else %}{{ kops_default_master_instance_type }}{% endif %}
+
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-{{ subnet.availability_zone }}
+  role: Master
+  subnets:
+    - {{ subnet.availability_zone }}
+
+{% endfor %}
