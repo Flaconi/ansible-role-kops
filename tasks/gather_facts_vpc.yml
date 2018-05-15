@@ -1,0 +1,30 @@
+---
+
+# TODO: FIX: expansion of dict keys
+- set_fact:
+    kops_vpc_filters:
+      "tag:Name": "{{ cluster.name }}"
+      "tag:KubernetesCluster": "{{ cluster.name }}"
+      #"tag:kubernetes.io/cluster/{{ cluster.name }}"
+
+- name: gather vpc facts
+  ec2_vpc_net_facts:
+    profile: "{{ kops_aws_profile | default(omit) }}"
+    region: "{{ cluster.region | default(kops_default_region) }}"
+    filters: "{{ kops_vpc_filters }}"
+  register: _kops_vpc_facts
+
+- name: fail if vpc was not found
+  assert:
+    that:
+      - _kops_vpc_facts.vpcs is defined
+      - _kops_vpc_facts.vpcs | length == 1
+    msg: Not exactly one VPC has been found
+
+- name: set vpc id
+  set_fact:
+    kops_vpc_id: "{{ _kops_vpc_facts.vpcs[0].id }}"
+
+- name: set vpc cidr
+  set_fact:
+    kops_vpc_cidr: "{{ _kops_vpc_facts.vpcs[0].cidr_block }}"

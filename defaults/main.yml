@@ -1,0 +1,28 @@
+---
+
+###
+### Sane defaults
+###
+
+kops_default_version: v1.10.2
+
+kops_default_type: private
+
+kops_default_region: eu-central-1
+
+kops_default_image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
+
+kops_default_api_access:
+  - 0.0.0.0/32
+
+kops_default_ssh_access:
+  - 0.0.0.0/32
+
+kops_default_master_instance_type: t2.medium
+
+kops_default_bastion_instance_type: t2.micro
+
+kops_default_bastion_availability_zones: [a]
+
+# The cluster array
+kops_cluster: []
