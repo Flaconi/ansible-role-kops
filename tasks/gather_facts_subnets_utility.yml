@@ -1,0 +1,32 @@
+---
+
+# TODO: FIX: expansion of dict keys
+- set_fact:
+    kops_subnet_utility_filters:
+      vpc-id: "{{ kops_vpc_id }}"
+      "tag:Name": "utility-{{ cluster.region | default(kops_default_region) }}?.{{ cluster.name }}"
+      "tag:KubernetesCluster": "{{ cluster.name }}"
+      "tag:SubnetType": Utility
+      #"tag:kubernetes.io/cluster/{{ cluster.name }}"
+      "tag:kubernetes.io/role/elb": "1"
+
+- name: gather utility subnet facts
+  ec2_vpc_subnet_facts:
+    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
+    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    profile: "{{ kops_aws_profile | default(omit) }}"
+    region: "{{ cluster.region | default(kops_default_region) }}"
+    filters: "{{ kops_subnet_utility_filters }}"
+  register: _kops_subnet_utility_facts
+
+- name: fail if no utility subnets were not found
+  assert:
+    that:
+      - _kops_subnet_utility_facts.subnets is defined
+      - _kops_subnet_utility_facts.subnets | length > 0
+    msg: No utility subnets have been found
+
+- name: set subnets
+  set_fact:
+    kops_utility_subnets: "{{ _kops_subnet_utility_facts.subnets | sort(attribute='availability_zone') }}"

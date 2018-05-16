@@ -1,0 +1,51 @@
+---
+
+###
+### Gather facts about existing infrastructure
+###
+
+# Returns:
+# * kops_vpc_cidr
+# * kops_vpc_id
+- include_tasks: gather_facts_vpc.yml
+
+# Returns:
+# * kops_private_subnets
+- include_tasks: gather_facts_subnets_private.yml
+
+# Returns:
+# * kops_utility_subnets
+- include_tasks: gather_facts_subnets_utility.yml
+
+
+###
+### Create templates
+###
+- name: ensure project build directory is present
+  file:
+    state: directory
+    path: "{{ kops_default_build_directory}}/{{ cluster.name }}"
+
+- name: generate cluster.yml
+  template:
+    src: cluster.yml.j2
+    dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/cluster.yml"
+    mode: 0644
+
+- name: generate ig-master.yml
+  template:
+    src: ig-master.yml.j2
+    dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/ig-master.yml"
+    mode: 0644
+
+- name: generate ig-worker.yml
+  template:
+    src: ig-worker.yml.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/ig-worker.yml"
+    mode: 0644
+
+- name: generate ig-bastion.yml
+  template:
+    src: ig-bastion.yml.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/ig-bastion.yml"
+    mode: 0644

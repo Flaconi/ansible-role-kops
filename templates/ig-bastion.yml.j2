@@ -1,0 +1,26 @@
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{ cluster.name }}
+  name: bastions
+spec:
+  image: {{ cluster.image | default(kops_default_image) }}
+  machineType: {% if 'bastion' in cluster and 'instance_type' in cluster.bastion %}{{ cluster.bastion.instance_type }}{% else %}{{ kops_default_bastion_instance_type }}{% endif %}
+
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: bastions
+  role: Bastion
+  subnets:
+{% for subnet in kops_utility_subnets %}
+{% set availability_zones = cluster.bastion.availability_zones if 'bastion' in cluster and 'availability_zones' in cluster.bastion else kops_default_bastion_availability_zones %}
+{% for az in availability_zones %}
+{% set str = cluster.region | default(kops_default_region) + az %}
+{% if str == subnet.availability_zone %}
+    - utility-{{ str }}
+{% endif %}
+{% endfor %}
+{% endfor %}

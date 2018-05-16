@@ -1,0 +1,25 @@
+{% for worker in cluster.workers %}
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{ cluster.name }}
+  name: {{ worker.instance_type | replace('.', '') }}{{ worker.availability_zones | join('') }}
+spec:
+  image: {{ cluster.image | default(kops_default_image) }}
+  machineType: {{ worker.instance_type }}
+  maxSize: {{ worker.max_size }}
+  minSize: {{ worker.min_size }}
+  nodeLabels:
+    kops.k8s.io/instancegroup: {{ worker.instance_type | replace('.', '') }}{{ worker.availability_zones | join('') }}
+  role: Node
+  rootVolumeSize: {{ worker.volume_size }}
+  subnets:
+{% for az in worker.availability_zones %}
+    - {{ cluster.region | default(kops_default_region) }}{{ az }}
+{% endfor %}
+
+{% endfor %}
