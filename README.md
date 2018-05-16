@@ -2,6 +2,8 @@
 
 handles the generation of Kops configuration files
 
+[![Build Status](https://travis-ci.org/Flaconi/ansible-role-kops.svg?branch=master)](https://travis-ci.org/Flaconi/ansible-role-kops)
+
 ## Requirements
 
 * Ansible 2.5
