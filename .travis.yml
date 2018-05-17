@@ -7,6 +7,10 @@ sudo: required
 services:
   - docker
 
+env:
+  global:
+    - ANSIBLE_VERSION=2.5
+
 
 jobs:
   include:
@@ -27,5 +31,4 @@ jobs:
         - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get update; then break; else i=$((i+1)); fi done
         - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce; then break; else i=$((i+1)); fi done
       script:
-        - docker build --no-cache -t ansible-roles-test-rolename tests/support
-        - docker run --rm -it -v $PWD:/etc/ansible/roles/kops --workdir /etc/ansible/roles/kops/tests ansible-roles-test-rolename
+        - docker run --rm -it -v $PWD:/etc/ansible/roles/kops --workdir /etc/ansible/roles/kops/tests flaconi/ansible:${ANSIBLE_VERSION} ./support/run-tests.sh
