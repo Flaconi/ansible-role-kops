@@ -4,7 +4,7 @@ handles the generation of Kops configuration files
 
 [![Build Status](https://travis-ci.org/Flaconi/ansible-role-kops.svg?branch=master)](https://travis-ci.org/Flaconi/ansible-role-kops)
 [![Version](https://img.shields.io/github/tag/Flaconi/ansible-role-kops.svg)](https://github.com/Flaconi/ansible-role-kops/tags)
-<!-- [![Ansible Galaxy](https://img.shields.io/ansible/role/d/25919.svg)](https://galaxy.ansible.com/Flaconi/kops/) -->
+[![Ansible Galaxy](https://img.shields.io/ansible/role/d/25923.svg)](https://galaxy.ansible.com/Flaconi/kops/)
 
 ## Requirements
 
