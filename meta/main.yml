@@ -1,0 +1,21 @@
+---
+dependencies: []
+
+galaxy_info:
+  company: Flaconi GmbH
+  author: Patrick Plocke
+  license: Apache 2.0
+  description: Create customized KOPS (Kubernetes) templates.
+  min_ansible_version: 2.5
+  platforms:
+    - name: all
+      versions:
+        - all
+  galaxy_tags:
+    - AWS
+    - aws
+    - amazon
+    - cloud
+    - Kops
+    - Kubernetes
+    - K8s

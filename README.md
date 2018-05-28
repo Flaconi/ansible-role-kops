@@ -3,6 +3,8 @@
 handles the generation of Kops configuration files
 
 [![Build Status](https://travis-ci.org/Flaconi/ansible-role-kops.svg?branch=master)](https://travis-ci.org/Flaconi/ansible-role-kops)
+[![Version](https://img.shields.io/github/tag/Flaconi/ansible-role-kops.svg)](https://github.com/Flaconi/ansible-role-kops/tags)
+<!-- [![Ansible Galaxy](https://img.shields.io/ansible/role/d/25919.svg)](https://galaxy.ansible.com/Flaconi/kops/) -->
 
 ## Requirements
 
@@ -52,9 +54,9 @@ kops_cluster:
     image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
     s3_bucket_name: playground-cluster-shop-state-store
     api_access:
-      - 185.28.184.194/32
+      - 185.28.180.95/32
     ssh_access:
-      - 185.28.184.194/32
+      - 185.28.180.95/32
     bastion:
       availability_zones: [a]
       instance_type: t2.micro
