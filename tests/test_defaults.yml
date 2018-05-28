@@ -2,4 +2,4 @@
 - name: Running the defaults test case
   hosts: localhost
   roles:
-    - kops
+    - rolename
