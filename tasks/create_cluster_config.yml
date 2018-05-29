@@ -56,3 +56,15 @@
     src: ig-bastion.yml.j2
     dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/ig-bastion.yml"
     mode: 0644
+
+- name: generate kops-create.sh
+  template:
+    src: kops-create.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-create.sh"
+    mode: 0755
+
+- name: generate kops-update.sh
+  template:
+    src: kops-update.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-update.sh"
+    mode: 0755

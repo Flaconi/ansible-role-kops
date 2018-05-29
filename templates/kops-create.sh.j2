@@ -1,0 +1,17 @@
+#/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+export NAME="{{ cluster.name }}"
+export KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name | default(cluster.name | regex_search('^([-_a-zA-Z0-9]+)\.', '\\1') | first + '-state-store') }}/{{ cluster.name }}"
+
+echo "kops create -f cluster.yml"
+echo "kops create -f ig-master.yml"
+echo "kops create -f ig-worker.yml"
+echo "kops create secret --name \${NAME} sshpublickey admin -i /path/to/shared/ssh/key.pub"
+echo "kops update cluster \${NAME} --yes"
+
+echo "kops create -f ig-bastion.yml --yes"
+echo "kops update cluster \${NAME} --yes"
