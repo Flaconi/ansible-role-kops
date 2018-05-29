@@ -4,14 +4,35 @@ set -e
 set -u
 set -o pipefail
 
-export NAME="{{ cluster.name }}"
-export KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name | default(cluster.name | regex_search('^([-_a-zA-Z0-9]+)\.', '\\1') | first + '-state-store') }}/{{ cluster.name }}"
+NAME="{{ cluster.name }}"
+KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name | default(cluster.name | regex_search('^([-_a-zA-Z0-9]+)\.', '\\1') | first + '-state-store') }}/{{ cluster.name }}"
 
-echo "kops create -f cluster.yml"
-echo "kops create -f ig-master.yml"
-echo "kops create -f ig-worker.yml"
-echo "kops create secret --name \${NAME} sshpublickey admin -i /path/to/shared/ssh/key.pub"
-echo "kops update cluster \${NAME} --yes"
 
-echo "kops create -f ig-bastion.yml --yes"
-echo "kops update cluster \${NAME} --yes"
+echo "#------------------------------------------------------------"
+echo "# Create KOPS templates"
+echo "#------------------------------------------------------------"
+echo "kops create --state ${KOPS_STATE_STORE} -f cluster.yml"
+echo "kops create --state ${KOPS_STATE_STORE} -f ig-master.yml"
+echo "kops create --state ${KOPS_STATE_STORE} -f ig-worker.yml"
+echo
+
+echo "#------------------------------------------------------------"
+echo "# Create SSH key"
+echo "#------------------------------------------------------------"
+echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i /path/to/shared/ssh/key.pub"
+echo
+
+echo "#------------------------------------------------------------"
+echo "# Apply"
+echo "#------------------------------------------------------------"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
+echo
+
+
+echo "#------------------------------------------------------------"
+echo "# Add Bastion host"
+echo "#------------------------------------------------------------"
+echo "kops create --state ${KOPS_STATE_STORE} -f ig-bastion.yml"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"

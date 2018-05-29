@@ -52,18 +52,18 @@ spec:
   subnets:
 {% for subnet in kops_private_subnets_nat %}
     - cidr: {{ subnet.cidr_block }}
-	  id: {{ subnet.id }}
-	  egress: {{ subnet.nat_id }}
-	  name: {{ subnet.availability_zone }}
-	  type: Private
-	  zone: {{ subnet.availability_zone }}
+      id: {{ subnet.id }}
+      egress: {{ subnet.nat_id }}
+      name: {{ subnet.availability_zone }}
+      type: Private
+      zone: {{ subnet.availability_zone }}
 {% endfor %}
 {% for subnet in kops_utility_subnets %}
     - cidr: {{ subnet.cidr_block }}
-	  id: {{ subnet.id }}
-	  name: utility-{{ subnet.availability_zone }}
-	  type: Utility
-	  zone: {{ subnet.availability_zone }}
+      id: {{ subnet.id }}
+      name: utility-{{ subnet.availability_zone }}
+      type: Utility
+      zone: {{ subnet.availability_zone }}
 {% endfor %}
   topology:
 #    bastion:
