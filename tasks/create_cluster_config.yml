@@ -10,13 +10,20 @@
 - include_tasks: gather_facts_vpc.yml
 
 # Returns:
-# * kops_private_subnets
-- include_tasks: gather_facts_subnets_private.yml
-
-# Returns:
 # * kops_utility_subnets
 - include_tasks: gather_facts_subnets_utility.yml
 
+# Returns:
+# * kops_private_subnets
+- include_tasks: gather_facts_subnets_private.yml
+
+# Returns
+# * kops_private_subnets_nat
+- include_tasks: gather_facts_nat_by_subnet.yml
+  loop_control:
+    loop_var: subnet
+  with_items:
+    - "{{ kops_private_subnets }}"
 
 ###
 ### Create templates

@@ -17,13 +17,13 @@ spec:
     logDriver: ""
   etcdClusters:
     - etcdMembers:
-{% for subnet in kops_private_subnets %}
+{% for subnet in kops_private_subnets_nat %}
       - instanceGroup: master-{{ subnet.availability_zone }}
         name: {{ subnet.availability_zone | regex_search('(.?)$', '\\1') | first }}
 {% endfor %}
       name: main
     - etcdMembers:
-{% for subnet in kops_private_subnets %}
+{% for subnet in kops_private_subnets_nat %}
       - instanceGroup: master-{{ subnet.availability_zone }}
         name: {{ subnet.availability_zone | regex_search('(.?)$', '\\1') | first }}
 {% endfor %}
@@ -50,9 +50,10 @@ spec:
     - {{ ip }}
 {% endfor %}
   subnets:
-{% for subnet in kops_private_subnets %}
+{% for subnet in kops_private_subnets_nat %}
     - cidr: {{ subnet.cidr_block }}
 	  id: {{ subnet.id }}
+	  egress: {{ subnet.nat_id }}
 	  name: {{ subnet.availability_zone }}
 	  type: Private
 	  zone: {{ subnet.availability_zone }}
