@@ -1,14 +1,17 @@
 ---
 
-# TODO: FIX: expansion of dict keys
 - set_fact:
     kops_subnet_private_filters:
-      vpc-id: "{{ kops_vpc_id }}"
-      "tag:Name": "{{ cluster.region | default(kops_default_region) }}?.{{ cluster.name }}"
-      "tag:KubernetesCluster": "{{ cluster.name }}"
-      "tag:SubnetType": Private
-      #"tag:kubernetes.io/cluster/{{ cluster.name }}"
-      "tag:kubernetes.io/role/internal-elb": "1"
+      - key: vpc-id
+        val: "{{ kops_vpc_id }}"
+      - key: "tag:Name"
+        val: "{{ cluster.region | default(kops_default_region) }}?.{{ cluster.name }}"
+      - key: "tag:SubnetType"
+        val: Private
+      - key: "tag:kubernetes.io/cluster/{{ default_kops_cluster_name }}"
+        val: shared
+      - key: "tag:kubernetes.io/role/internal-elb"
+        val: "1"
 
 - name: gather private subnet facts
   ec2_vpc_subnet_facts:
@@ -17,7 +20,7 @@
     security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ kops_aws_profile | default(omit) }}"
     region: "{{ cluster.region | default(kops_default_region) }}"
-    filters: "{{ kops_subnet_private_filters }}"
+    filters: "{{ kops_subnet_private_filters | get_attr('key', 'val') }}"
   register: _kops_subnet_private_facts
 
 - name: fail if no private subnets were not found
