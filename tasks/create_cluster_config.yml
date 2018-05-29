@@ -19,6 +19,8 @@
 
 # Returns
 # * kops_private_subnets_nat
+- set_fact:
+    kops_private_subnets_nat: []
 - include_tasks: gather_facts_nat_by_subnet.yml
   loop_control:
     loop_var: subnet

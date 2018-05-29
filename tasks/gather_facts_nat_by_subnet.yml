@@ -6,17 +6,6 @@
         val: "{{ kops_vpc_id }}"
       - key: subnet-id
         val: "{{ subnet.id }}"
-        #      - key: "tag:Name"
-        #        val: "{{ cluster.region | default(kops_default_region) }}?.{{ cluster.name }}"
-        #      - key: "tag:SubnetType"
-        #        val: Private
-        #      - key: "tag:kubernetes.io/cluster/{{ default_kops_cluster_name }}"
-        #        val: shared
-        #      - key: "tag:kubernetes.io/role/internal-elb"
-        #        val: "1"
-
-
-
 
 - name: gather nat gateway by filter
   ec2_vpc_nat_gateway_facts:
@@ -26,7 +15,6 @@
     profile: "{{ kops_aws_profile | default(omit) }}"
     region: "{{ cluster.region | default(kops_default_region) }}"
     filters: "{{ kops_subnet_private_nat_filters | get_attr('key', 'val') }}"
-    #filters: "{}"
   register: _kops_nat_gw
 
 - name: fail if not exactly one NAT gateway was found by filter
@@ -36,6 +24,11 @@
       - _kops_nat_gw.result | length == 1
     msg: Not exactly one NAT gateway has been found
 
-- name: set mered subnet array gateway array
+- name: set merged subnet array gateway array
   set_fact:
-    kops_private_subnets_nat: "{{ kops_private_subnets_nat | default([]) + [subnet | combine({'nat_id' : _kops_nat_gw.result[0]['nat_gateway_id']})] }}"
+    kops_private_subnets_nat: |
+      {{
+        kops_private_subnets_nat + [
+          subnet | combine({'nat_id' : _kops_nat_gw.result[0]['nat_gateway_id']})
+        ]
+      }}
