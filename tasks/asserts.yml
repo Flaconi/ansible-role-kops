@@ -40,22 +40,41 @@
   assert:
     that:
       - item in cluster.az | default(kops_default_az)
-    msg: "Master availability zone '{{ item }}' is not within '[{{ cluster.az | default(kops_default_az) | join(',') }}]'"
+    msg: >-
+      Master availability zone '{{ item }}' is not within
+      '[{{ cluster.az | default(kops_default_az) | join(',') }}]'
   with_items:
-    - "{% if 'master' in cluster and 'az' in cluster.master %}{{ cluster.master.az }}{% else %}{{ kops_default_master_az }}{% endif %}"
+    - >-
+      {%- if 'master' in cluster and 'az' in cluster.master -%}
+      {{ cluster.master.az }}
+      {%- else -%}
+      {{ kops_default_master_az }}
+      {%- endif -%}
 
 - name: ensure bastion availability zones are within defined availability zones
   assert:
     that:
       - item in cluster.az | default(kops_default_az)
-    msg: "Bastion availability zone '{{ item }}' is not within '[{{ cluster.az | default(kops_default_az) | join(',') }}]'"
+    msg: >-
+      Bastion availability zone '{{ item }}' is not within
+      '[{{ cluster.az | default(kops_default_az) | join(',') }}]'
   with_items:
-    - "{% if 'bastion' in cluster and 'az' in cluster.bastion %}{{ cluster.bastion.az }}{% else %}{{ kops_default_bastion_az }}{% endif %}"
+    - >-
+      {%- if 'bastion' in cluster and 'az' in cluster.bastion -%}
+      {{ cluster.bastion.az }}
+      {%- else -%}
+      {{ kops_default_bastion_az }}
+      {%- endif -%}
 
 - name: ensure worker availability zones are within defined availability zones
   assert:
     that:
-      - "{% for az in item.az | default(kops_default_worker_az) %}'{{ az }}' in cluster.az | default(kops_default_az) and {% endfor %} true"
-    msg: "Worker availability zones '{{ item.az | default(kops_default_worker_az) | join(',') }}' is not within '[{{ cluster.az | default(kops_default_az) | join(',') }}]'"
+      - >-
+        {%- for az in item.az | default(kops_default_worker_az) -%}
+        ('{{ az }}' in cluster.az | default(kops_default_az)) and
+        {% endfor %} true
+    msg: >-
+      Worker availability zones '{{ item.az | default(kops_default_worker_az) | join(',') }}'
+      is not within '[{{ cluster.az | default(kops_default_az) | join(',') }}]'
   with_items:
     - "{{ cluster.workers }}"
