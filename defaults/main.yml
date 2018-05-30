@@ -46,15 +46,15 @@ kops_default_az: [a, b, c]
 ### Node defines
 ###
 
-kops_default_master_instance_type: t2.medium
-kops_default_worker_instance_type: t2.medium
-kops_default_bastion_instance_type: t2.micro
-
-# Default Availability Zone of the bastion host.
-# Note these zones must be part of: 'kops_default_az'
+# Default Availability Zones of master, worker and bastion host
+# Note these zones must be within range of 'kops_default_az'
 kops_default_master_az: [a, b, c]
 kops_default_worker_az: [a, b, c]
 kops_default_bastion_az: [a]
+
+kops_default_master_instance_type: t2.medium
+kops_default_worker_instance_type: t2.medium
+kops_default_bastion_instance_type: t2.micro
 
 kops_default_master_count: 3
 
