@@ -1,4 +1,10 @@
 {% for worker in cluster.workers %}
+{% set machine_type = worker.instance_type | default(kops_default_worker_instance_type) %}
+{% set worker_az = worker.az | default(kops_default_worker_az) %}
+{% set worker_ig = machine_type | replace('.', '') + worker_az | join('') %}
+{% set min_size = worker.min_size | default(kops_default_worker_min_size) %}
+{% set max_size = worker.max_size | default(kops_default_worker_max_size) %}
+{% set root_volume_size = worker.vol_size | default(kops_default_worker_vol_size) %}
 ---
 
 apiVersion: kops/v1alpha2
@@ -7,18 +13,18 @@ metadata:
   creationTimestamp: null
   labels:
     kops.k8s.io/cluster: {{ cluster.name }}
-  name: {{ worker.instance_type | replace('.', '') }}{{ worker.availability_zones | join('') }}
+  name: {{ worker.name }}
 spec:
   image: {{ cluster.image | default(kops_default_image) }}
-  machineType: {{ worker.instance_type }}
-  maxSize: {{ worker.max_size }}
-  minSize: {{ worker.min_size }}
+  machineType: {{ machine_type }}
+  maxSize: {{ max_size }}
+  minSize: {{ min_size }}
   nodeLabels:
-    kops.k8s.io/instancegroup: {{ worker.instance_type | replace('.', '') }}{{ worker.availability_zones | join('') }}
+    kops.k8s.io/instancegroup: {{ worker_ig }}
   role: Node
-  rootVolumeSize: {{ worker.volume_size }}
+  rootVolumeSize: {{ root_volume_size }}
   subnets:
-{% for az in worker.availability_zones %}
+{% for az in worker_az %}
     - {{ cluster.region | default(kops_default_region) }}{{ az }}
 {% endfor %}
 

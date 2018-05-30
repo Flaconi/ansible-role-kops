@@ -1,11 +1,18 @@
 ---
 
-- set_fact:
+###
+### Gather subnet
+###
+
+- name: set private subnet filter
+  set_fact:
     kops_subnet_private_filters:
       - key: vpc-id
         val: "{{ kops_vpc_id }}"
+      - key: availability-zone
+        val: "{{ cluster.region | default(kops_default_region) }}{{ az }}"
       - key: "tag:Name"
-        val: "{{ cluster.region | default(kops_default_region) }}?.{{ cluster.name }}"
+        val: "{{ cluster.region | default(kops_default_region) }}{{ az }}.{{ cluster.name }}"
       - key: "tag:SubnetType"
         val: Private
       - key: "tag:kubernetes.io/cluster/{{ default_kops_cluster_name }}"
@@ -23,13 +30,61 @@
     filters: "{{ kops_subnet_private_filters | get_attr('key', 'val') }}"
   register: _kops_subnet_private_facts
 
-- name: fail if no private subnets were not found
+- name: fail if not exactly one private subnet was not found
   assert:
     that:
       - _kops_subnet_private_facts.subnets is defined
-      - _kops_subnet_private_facts.subnets | length > 0
-    msg: No private subnets have been found
+      - _kops_subnet_private_facts.subnets | length == 1
+    msg: "Not exactly one private subnet has been found in az: {{ az }}"
 
-- name: set subnets
+
+###
+### Gather NAT GW
+###
+
+- name: set NAT GW filter
   set_fact:
-    kops_private_subnets: "{{ _kops_subnet_private_facts.subnets | sort(attribute='availability_zone') }}"
+    kops_subnet_private_nat_filters:
+      - key: vpc-id
+        val: "{{ kops_vpc_id }}"
+      - key: subnet-id
+        val: "{{ _kops_subnet_private_facts.subnets[0].id }}"
+
+- name: gather nat gateway by filter
+  ec2_vpc_nat_gateway_facts:
+    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
+    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    profile: "{{ kops_aws_profile | default(omit) }}"
+    region: "{{ cluster.region | default(kops_default_region) }}"
+    filters: "{{ kops_subnet_private_nat_filters | get_attr('key', 'val') }}"
+  register: _kops_nat_gw_facts
+
+- name: fail if not exactly one NAT gateway was found by filter
+  assert:
+    that:
+      - _kops_nat_gw_facts.result is defined
+      - _kops_nat_gw_facts.result | length == 1
+    msg: Not exactly one NAT gateway has been found
+
+
+###
+### Set return variable
+###
+- name: set private dict item
+  set_fact:
+    kops_private_item: |
+      {{
+        {
+          _kops_subnet_private_facts.subnets[0].availability_zone | regex_search('(.?)$', '\1') | first: {
+            'id':     _kops_subnet_private_facts.subnets[0].id,
+            'az':     _kops_subnet_private_facts.subnets[0].availability_zone,
+            'cidr':   _kops_subnet_private_facts.subnets[0].cidr_block,
+            'nat_id': _kops_nat_gw_facts.result[0].nat_gateway_id
+          }
+        }
+      }}
+
+- name: merge private subnet array
+  set_fact:
+    kops_private_subnets: "{{ kops_private_subnets | combine(kops_private_item) }}"

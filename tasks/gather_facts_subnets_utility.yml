@@ -1,11 +1,14 @@
 ---
 
-- set_fact:
+- name: set utility subnet filter
+  set_fact:
     kops_subnet_utility_filters:
       - key: vpc-id
         val: "{{ kops_vpc_id }}"
+      - key: availability-zone
+        val: "{{ cluster.region | default(kops_default_region) }}{{ az }}"
       - key: "tag:Name"
-        val: "utility-{{ cluster.region | default(kops_default_region) }}?.{{ cluster.name }}"
+        val: "utility-{{ cluster.region | default(kops_default_region) }}{{ az }}.{{ cluster.name }}"
       - key: "tag:SubnetType"
         val: Utility
       - key: "tag:kubernetes.io/cluster/{{ default_kops_cluster_name }}"
@@ -23,13 +26,26 @@
     filters: "{{ kops_subnet_utility_filters | get_attr('key', 'val') }}"
   register: _kops_subnet_utility_facts
 
-- name: fail if no utility subnets were not found
+- name: fail if not exactly one utility subnet was not found
   assert:
     that:
       - _kops_subnet_utility_facts.subnets is defined
-      - _kops_subnet_utility_facts.subnets | length > 0
-    msg: No utility subnets have been found
+      - _kops_subnet_utility_facts.subnets | length == 1
+    msg: "Not exactly one utility subnet has been found in az: {{ az }}"
 
-- name: set subnets
+- name: set utility dict item
   set_fact:
-    kops_utility_subnets: "{{ _kops_subnet_utility_facts.subnets | sort(attribute='availability_zone') }}"
+    kops_utility_item: |
+      {{
+        {
+          _kops_subnet_utility_facts.subnets[0].availability_zone | regex_search('(.?)$', '\1') | first: {
+            'id':   _kops_subnet_utility_facts.subnets[0].id,
+            'az':   _kops_subnet_utility_facts.subnets[0].availability_zone,
+            'cidr': _kops_subnet_utility_facts.subnets[0].cidr_block
+          }
+        }
+      }}
+
+- name: merge utility subnet array
+  set_fact:
+    kops_utility_subnets: "{{ kops_utility_subnets | combine(kops_utility_item) }}"
