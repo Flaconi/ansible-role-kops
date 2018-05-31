@@ -29,7 +29,7 @@
   loop_control:
     loop_var: az
   with_items:
-    - "{{ cluster.az |default(kops_default_az) }}"
+    - "{{ cluster.az | default(kops_default_az) }}"
 
 # Returns:
 # * kops_private_subnets
@@ -37,7 +37,7 @@
   loop_control:
     loop_var: az
   with_items:
-    - "{{ cluster.az |default(kops_default_az) }}"
+    - "{{ cluster.az | default(kops_default_az) }}"
 
 
 ###
