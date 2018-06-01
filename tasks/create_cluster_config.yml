@@ -95,3 +95,9 @@
     src: kops-delete.sh.j2
     dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-delete.sh"
     mode: 0755
+
+- name: generate kubectl-context.sh
+  template:
+    src: kubectl-context.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kubectl-context.sh"
+    mode: 0755
