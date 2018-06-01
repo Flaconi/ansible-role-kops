@@ -83,3 +83,15 @@
     src: kops-update.sh.j2
     dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-update.sh"
     mode: 0755
+
+- name: generate kops-info.sh
+  template:
+    src: kops-info.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-info.sh"
+    mode: 0755
+
+- name: generate kops-delete.sh
+  template:
+    src: kops-delete.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-delete.sh"
+    mode: 0755

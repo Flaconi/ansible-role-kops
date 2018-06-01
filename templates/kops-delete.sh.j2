@@ -1,0 +1,15 @@
+#/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+NAME="{{ cluster.name }}"
+KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}/{{ cluster.name }}"
+
+
+echo "#------------------------------------------------------------"
+echo "# Delete KOPS cluster"
+echo "#------------------------------------------------------------"
+echo "kops delete --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops delete --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
