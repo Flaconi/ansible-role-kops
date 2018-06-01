@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 export NAME="{{ cluster.name }}"
-export KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}/{{ cluster.name }}"
+export KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}"
 
 
 echo "#------------------------------------------------------------"
