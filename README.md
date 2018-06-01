@@ -30,9 +30,9 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 | `kops_default_worker_instance_type`  | `t2.medium`    | Default instance type for worker nodes |
 | `kops_default_bastion_instance_type` | `t2.micro`     | Default instance type for bastion nodes |
 | `kops_default_master_count`          | `3`            | Number of master nodes to launch |
-|` kkops_default_worker_min_size`      | `1`            | Minimum number of worker nodes per instance group |
-|` kkops_default_worker_max_size`      | `3`            | Maximum number of worker nodes per instance group |
-|` kkops_default_worker_vol_size`      | `200`          | Root volume size in GB for each worker node |
+|` kops_default_worker_min_size`       | `1`            | Minimum number of worker nodes per instance group |
+|` kops_default_worker_max_size`       | `3`            | Maximum number of worker nodes per instance group |
+|` kops_default_worker_vol_size`       | `200`          | Root volume size in GB for each worker node |
 | `kops_default_build_directory`       | `build`        | Template generation directory |
 
 ## Example definition
