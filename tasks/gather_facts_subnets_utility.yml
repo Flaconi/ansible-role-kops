@@ -1,5 +1,9 @@
 ---
 
+###
+### Gather subnet
+###
+
 - name: set utility subnet filter
   set_fact:
     kops_subnet_utility_filters:
@@ -33,6 +37,41 @@
       - _kops_subnet_utility_facts.subnets | length == 1
     msg: "Not exactly one utility subnet has been found in az: {{ az }}"
 
+
+###
+### Gather NAT GW
+###
+
+- name: set NAT GW filter
+  set_fact:
+    kops_subnet_utility_nat_filters:
+      - key: vpc-id
+        val: "{{ kops_vpc_id }}"
+      - key: subnet-id
+        val: "{{ _kops_subnet_utility_facts.subnets[0].id }}"
+
+- name: gather nat gateway by filter
+  ec2_vpc_nat_gateway_facts:
+    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
+    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    profile: "{{ kops_aws_profile | default(omit) }}"
+    region: "{{ cluster.region | default(kops_default_region) }}"
+    filters: "{{ kops_subnet_utility_nat_filters | get_attr('key', 'val') }}"
+  register: _kops_nat_gw_facts
+
+- name: fail if not exactly one NAT gateway was found by filter
+  assert:
+    that:
+      - _kops_nat_gw_facts.result is defined
+      - _kops_nat_gw_facts.result | length == 1
+    msg: Not exactly one NAT gateway has been found
+
+
+###
+### Set return variable
+###
+
 - name: set utility dict item
   set_fact:
     kops_utility_item: |
@@ -41,7 +80,8 @@
           _kops_subnet_utility_facts.subnets[0].availability_zone | regex_search('(.?)$', '\1') | first: {
             'id':   _kops_subnet_utility_facts.subnets[0].id,
             'az':   _kops_subnet_utility_facts.subnets[0].availability_zone,
-            'cidr': _kops_subnet_utility_facts.subnets[0].cidr_block
+            'cidr': _kops_subnet_utility_facts.subnets[0].cidr_block,
+            'nat_id': _kops_nat_gw_facts.result[0].nat_gateway_id
           }
         }
       }}
