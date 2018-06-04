@@ -16,10 +16,10 @@ spec:
   role: Bastion
   subnets:
 {% for subnet in kops_utility_subnets %}
-{% set availability_zones = cluster.bastion.availability_zones if 'bastion' in cluster and 'availability_zones' in cluster.bastion else kops_default_bastion_availability_zones %}
+{% set availability_zones = cluster.bastion.az if 'bastion' in cluster and 'az' in cluster.bastion else kops_default_bastion_az %}
 {% for az in availability_zones %}
 {% set str = cluster.region | default(kops_default_region) + az %}
-{% if str == subnet.availability_zone %}
+{% if str == kops_utility_subnets[subnet].az %}
     - utility-{{ str }}
 {% endif %}
 {% endfor %}

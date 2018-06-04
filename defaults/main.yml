@@ -1,16 +1,14 @@
 ---
 
 ###
-### Sane defaults
+### General Kubernetes defines
 ###
 
-kops_default_version: v1.10.2
-
-kops_default_type: private
+kops_default_version: v1.10.3
 
 kops_default_region: eu-central-1
 
-kops_default_image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
+kops_default_image: kope.io/k8s-1.9-debian-jessie-amd64-hvm-ebs-2018-03-11
 
 kops_default_api_access:
   - 0.0.0.0/32
@@ -18,15 +16,62 @@ kops_default_api_access:
 kops_default_ssh_access:
   - 0.0.0.0/32
 
-kops_default_master_instance_type: t2.medium
 
+###
+### Infrastructure defines
+###
+
+# By default 'shared' infrastructure is disabled, which means Kops will take care about creation
+# everything (VPC, subnets, NAT, IGW, etc).
+# If you prefer to provision infrastructure via Ansible/Terraform beforehand, set this value
+# to True and Kops will deploy the cluster in this existing infrastructure without changing
+# anything of it.
+# TODO: Implement me
+#kops_default_shared_infrastructure: False
+
+
+###
+### High Availability
+###
+
+# This defines all availablity zones that should be useable by kubernetes
+# When not using existing infrastructure one subnet will be created by Kops in each zone
+# each for utitilies and cluster subnets.
+# When using existing infrastructure, make sure those subnets already exists, otherwise
+# this role will throw an error.
+kops_default_az: [a, b, c]
+
+
+###
+### Node defines
+###
+
+# Default Availability Zones of master, worker and bastion host
+# Note these zones must be within range of 'kops_default_az'
+kops_default_master_az: [a, b, c]
+kops_default_worker_az: [a, b, c]
+kops_default_bastion_az: [a]
+
+kops_default_master_instance_type: t2.medium
+kops_default_worker_instance_type: t2.medium
 kops_default_bastion_instance_type: t2.micro
 
-kops_default_bastion_availability_zones: [a]
+kops_default_master_count: 3
+
+kops_default_worker_min_size: 1
+kops_default_worker_max_size: 3
+kops_default_worker_vol_size: 200
+
+###
+### Role defines
+###
 
 # When generating the yaml files it will be populated with a sub-directory
 # named after the cluster. Overwrite to specify a custom location
 kops_default_build_directory: build
 
-# The cluster array
+
+###
+### Cluster array definition (See README.md)
+###
 kops_cluster: []

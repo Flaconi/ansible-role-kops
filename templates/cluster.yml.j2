@@ -11,21 +11,35 @@ spec:
     rbac: {}
   channel: stable
   cloudProvider: aws
-  configBase: s3://{{ cluster.s3_bucket_name | default(cluster.name | regex_search('^([-_a-zA-Z0-9]+)\.', '\\1') | first + '-state-store') }}/{{ cluster.name }}
+  configBase: s3://{{ cluster.s3_bucket_name }}/{{ cluster.name }}
   docker:
     insecureRegistry: 100.64.0.0/10
     logDriver: ""
   etcdClusters:
     - etcdMembers:
-{% for subnet in kops_private_subnets %}
-      - instanceGroup: master-{{ subnet.availability_zone }}
-        name: {{ subnet.availability_zone | regex_search('(.?)$', '\\1') | first }}
+{# Start of var definition #}
+{% set master_cnt = cluster.master.count if 'master' in cluster and 'count' in cluster.master else kops_default_master_count %}
+{% set master_azs = cluster.master.az if 'master' in cluster and 'az' in cluster.master else kops_default_master_az %}
+{# End of var definition #}
+{# Loop as many times as master nodes have been defined #}
+{% for n in range(0, master_cnt) %}
+{# mod operation #}
+{% set index = n % (master_azs | length) %}
+{% set curr_az = master_azs[index] %}
+{% set subnet = kops_private_subnets[curr_az] %}
+      - instanceGroup: master-{{ subnet.az }}
+        name: {{ curr_az }}-{{ n }}
 {% endfor %}
       name: main
     - etcdMembers:
-{% for subnet in kops_private_subnets %}
-      - instanceGroup: master-{{ subnet.availability_zone }}
-        name: {{ subnet.availability_zone | regex_search('(.?)$', '\\1') | first }}
+{# Loop as many times as master nodes have been defined #}
+{% for n in range(0, master_cnt) %}
+{# mod operation #}
+{% set index = n % (master_azs | length) %}
+{% set curr_az = master_azs[index] %}
+{% set subnet = kops_private_subnets[curr_az] %}
+      - instanceGroup: master-{{ subnet.az }}
+        name: {{ curr_az }}-{{ n }}
 {% endfor %}
       name: events
   iam:
@@ -50,19 +64,21 @@ spec:
     - {{ ip }}
 {% endfor %}
   subnets:
-{% for subnet in kops_private_subnets %}
-    - cidr: {{ subnet.cidr_block }}
-	  id: {{ subnet.id }}
-	  name: {{ subnet.availability_zone }}
-	  type: Private
-	  zone: {{ subnet.availability_zone }}
+{% for subnet in (kops_private_subnets.keys() | sort) %}
+    - cidr: {{ kops_private_subnets[subnet].cidr }}
+      id: {{ kops_private_subnets[subnet].id }}
+      {# The NAT GW ID is taken from the public subnets equivilants -#}
+      egress: {{ kops_utility_subnets[subnet].nat_id }}
+      name: {{ kops_private_subnets[subnet].az }}
+      type: Private
+      zone: {{ kops_private_subnets[subnet].az }}
 {% endfor %}
-{% for subnet in kops_utility_subnets %}
-    - cidr: {{ subnet.cidr_block }}
-	  id: {{ subnet.id }}
-	  name: utility-{{ subnet.availability_zone }}
-	  type: Utility
-	  zone: {{ subnet.availability_zone }}
+{% for subnet in (kops_utility_subnets.keys() | sort) %}
+    - cidr: {{ kops_utility_subnets[subnet].cidr }}
+      id: {{ kops_utility_subnets[subnet].id }}
+      name: utility-{{ kops_utility_subnets[subnet].az }}
+      type: Utility
+      zone: {{ kops_utility_subnets[subnet].az }}
 {% endfor %}
   topology:
 #    bastion:

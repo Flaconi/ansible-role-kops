@@ -1,11 +1,11 @@
 ---
 
-# TODO: FIX: expansion of dict keys
 - set_fact:
     kops_vpc_filters:
-      "tag:Name": "{{ cluster.name }}"
-      "tag:KubernetesCluster": "{{ cluster.name }}"
-      #"tag:kubernetes.io/cluster/{{ cluster.name }}"
+      - key: "tag:Name"
+        val: "{{ cluster.name }}"
+      - key: "tag:kubernetes.io/cluster/{{ default_kops_cluster_name }}"
+        val: shared
 
 - name: gather vpc facts
   ec2_vpc_net_facts:
@@ -14,7 +14,7 @@
     security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ kops_aws_profile | default(omit) }}"
     region: "{{ cluster.region | default(kops_default_region) }}"
-    filters: "{{ kops_vpc_filters }}"
+    filters: "{{ kops_vpc_filters | get_attr('key', 'val') }}"
   register: _kops_vpc_facts
 
 - name: fail if vpc was not found

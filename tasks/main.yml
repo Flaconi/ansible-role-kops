@@ -4,7 +4,7 @@
 ### Main entrypoint
 ###
 - include_tasks: create_cluster_config.yml
-  vars:
-    cluster: "{{ item }}"
+  loop_control:
+    loop_var: cluster
   with_items:
     - "{{ kops_cluster }}"

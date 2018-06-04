@@ -1,0 +1,38 @@
+#/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+NAME="{{ cluster.name }}"
+KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}"
+
+
+echo "#------------------------------------------------------------"
+echo "# Create KOPS templates"
+echo "#------------------------------------------------------------"
+echo "kops create --state ${KOPS_STATE_STORE} -f cluster.yml"
+echo "kops create --state ${KOPS_STATE_STORE} -f ig-master.yml"
+echo "kops create --state ${KOPS_STATE_STORE} -f ig-worker.yml"
+echo
+
+echo "#------------------------------------------------------------"
+echo "# Create SSH key"
+echo "#------------------------------------------------------------"
+echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i /path/to/shared/ssh/key.pub"
+echo
+
+echo "#------------------------------------------------------------"
+echo "# Apply"
+echo "#------------------------------------------------------------"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
+echo
+
+
+echo "#------------------------------------------------------------"
+echo "# Add Bastion host"
+echo "#------------------------------------------------------------"
+echo "kops create --state ${KOPS_STATE_STORE} -f ig-bastion.yml"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"

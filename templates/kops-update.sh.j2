@@ -1,0 +1,31 @@
+#/usr/bin/env bash
+
+set -e
+set -u
+set -o pipefail
+
+export NAME="{{ cluster.name }}"
+export KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}"
+
+
+echo "#------------------------------------------------------------"
+echo "# Update KOPS templates"
+echo "#------------------------------------------------------------"
+echo "kops replace --state ${KOPS_STATE_STORE} -f cluster.yml"
+echo "kops replace --state ${KOPS_STATE_STORE} -f ig-master.yml"
+echo "kops replace --state ${KOPS_STATE_STORE} -f ig-worker.yml"
+echo "kops replace --state ${KOPS_STATE_STORE} -f ig-bastion.yml"
+echo
+
+echo "#------------------------------------------------------------"
+echo "# Update KOPS cluster"
+echo "#------------------------------------------------------------"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
+echo
+
+echo "#------------------------------------------------------------"
+echo "# Rolling Update KOPS cluster"
+echo "#------------------------------------------------------------"
+echo "kops rolling-update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops rolling-update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"

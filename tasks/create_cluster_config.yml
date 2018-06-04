@@ -1,6 +1,20 @@
 ---
 
 ###
+### Assert defaults and cluster overwrites
+###
+- include_tasks: asserts.yml
+
+
+###
+### Empty array variables for each loop iteration
+###
+- set_fact:
+    kops_utility_subnets: []
+    kops_private_subnets: []
+
+
+###
 ### Gather facts about existing infrastructure
 ###
 
@@ -10,12 +24,20 @@
 - include_tasks: gather_facts_vpc.yml
 
 # Returns:
-# * kops_private_subnets
-- include_tasks: gather_facts_subnets_private.yml
-
-# Returns:
 # * kops_utility_subnets
 - include_tasks: gather_facts_subnets_utility.yml
+  loop_control:
+    loop_var: az
+  with_items:
+    - "{{ cluster.az | default(kops_default_az) }}"
+
+# Returns:
+# * kops_private_subnets
+- include_tasks: gather_facts_subnets_private.yml
+  loop_control:
+    loop_var: az
+  with_items:
+    - "{{ cluster.az | default(kops_default_az) }}"
 
 
 ###
@@ -49,3 +71,33 @@
     src: ig-bastion.yml.j2
     dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/ig-bastion.yml"
     mode: 0644
+
+- name: generate kops-create.sh
+  template:
+    src: kops-create.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-create.sh"
+    mode: 0755
+
+- name: generate kops-update.sh
+  template:
+    src: kops-update.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-update.sh"
+    mode: 0755
+
+- name: generate kops-info.sh
+  template:
+    src: kops-info.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-info.sh"
+    mode: 0755
+
+- name: generate kops-delete.sh
+  template:
+    src: kops-delete.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-delete.sh"
+    mode: 0755
+
+- name: generate kubectl-context.sh
+  template:
+    src: kubectl-context.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kubectl-context.sh"
+    mode: 0755

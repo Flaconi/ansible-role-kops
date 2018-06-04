@@ -1,14 +1,24 @@
 ---
 
-# TODO: FIX: expansion of dict keys
-- set_fact:
+###
+### Gather subnet
+###
+
+- name: set private subnet filter
+  set_fact:
     kops_subnet_private_filters:
-      vpc-id: "{{ kops_vpc_id }}"
-      "tag:Name": "{{ cluster.region | default(kops_default_region) }}?.{{ cluster.name }}"
-      "tag:KubernetesCluster": "{{ cluster.name }}"
-      "tag:SubnetType": Private
-      #"tag:kubernetes.io/cluster/{{ cluster.name }}"
-      "tag:kubernetes.io/role/internal-elb": "1"
+      - key: vpc-id
+        val: "{{ kops_vpc_id }}"
+      - key: availability-zone
+        val: "{{ cluster.region | default(kops_default_region) }}{{ az }}"
+      - key: "tag:Name"
+        val: "{{ cluster.region | default(kops_default_region) }}{{ az }}.{{ cluster.name }}"
+      - key: "tag:SubnetType"
+        val: Private
+      - key: "tag:kubernetes.io/cluster/{{ default_kops_cluster_name }}"
+        val: shared
+      - key: "tag:kubernetes.io/role/internal-elb"
+        val: "1"
 
 - name: gather private subnet facts
   ec2_vpc_subnet_facts:
@@ -17,16 +27,34 @@
     security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ kops_aws_profile | default(omit) }}"
     region: "{{ cluster.region | default(kops_default_region) }}"
-    filters: "{{ kops_subnet_private_filters }}"
+    filters: "{{ kops_subnet_private_filters | get_attr('key', 'val') }}"
   register: _kops_subnet_private_facts
 
-- name: fail if no private subnets were not found
+- name: fail if not exactly one private subnet was not found
   assert:
     that:
       - _kops_subnet_private_facts.subnets is defined
-      - _kops_subnet_private_facts.subnets | length > 0
-    msg: No private subnets have been found
+      - _kops_subnet_private_facts.subnets | length == 1
+    msg: "Not exactly one private subnet has been found in az: {{ az }}"
 
-- name: set subnets
+
+###
+### Set return variable
+###
+
+- name: set private dict item
   set_fact:
-    kops_private_subnets: "{{ _kops_subnet_private_facts.subnets | sort(attribute='availability_zone') }}"
+    kops_private_item: |
+      {{
+        {
+          _kops_subnet_private_facts.subnets[0].availability_zone | regex_search('(.?)$', '\1') | first: {
+            'id':     _kops_subnet_private_facts.subnets[0].id,
+            'az':     _kops_subnet_private_facts.subnets[0].availability_zone,
+            'cidr':   _kops_subnet_private_facts.subnets[0].cidr_block
+          }
+        }
+      }}
+
+- name: merge private subnet array
+  set_fact:
+    kops_private_subnets: "{{ kops_private_subnets | combine(kops_private_item) }}"
