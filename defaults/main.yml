@@ -4,11 +4,11 @@
 ### General Kubernetes defines
 ###
 
-kops_default_version: v1.10.2
+kops_default_version: v1.10.3
 
 kops_default_region: eu-central-1
 
-kops_default_image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
+kops_default_image: kope.io/k8s-1.9-debian-jessie-amd64-hvm-ebs-2018-03-11
 
 kops_default_api_access:
   - 0.0.0.0/32
