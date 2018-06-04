@@ -17,9 +17,11 @@ spec:
     logDriver: ""
   etcdClusters:
     - etcdMembers:
-{# Loop as many times as master nodes have been defined #}
+{# Start of var definition #}
 {% set master_cnt = cluster.master.count if 'master' in cluster and 'count' in cluster.master else kops_default_master_count %}
 {% set master_azs = cluster.master.az if 'master' in cluster and 'az' in cluster.master else kops_default_master_az %}
+{# End of var definition #}
+{# Loop as many times as master nodes have been defined #}
 {% for n in range(0, master_cnt) %}
 {# mod operation #}
 {% set index = n % (master_azs | length) %}
@@ -31,8 +33,6 @@ spec:
       name: main
     - etcdMembers:
 {# Loop as many times as master nodes have been defined #}
-{% set master_cnt = cluster.master.count if 'master' in cluster and 'count' in cluster.master else kops_default_master_count %}
-{% set master_azs = cluster.master.az if 'master' in cluster and 'az' in cluster.master else kops_default_master_az %}
 {% for n in range(0, master_cnt) %}
 {# mod operation #}
 {% set index = n % (master_azs | length) %}
