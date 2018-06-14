@@ -1,14 +1,37 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -e
 set -u
 set -o pipefail
 
 NAME="{{ cluster.name }}"
-KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}/{{ cluster.name }}"
+
+RUN=0
+{% raw %}
+if [ "${#}" -gt "0" ] && [ "${1}" = "--yes" ]; then
+{% endraw %}
+	RUN=1
+fi
+
+echo
+echo
+echo "#================================================================================"
+echo "#"
+echo "#   S W I T C H   K U B E C T L   C O N T E X T"
+echo "#"
+if [ "${RUN}" -eq "1" ]; then
+	echo "#   !!! EXECUTING COMMANDS !!!"
+else
+	echo "#   NOTES: RUN WITH '--yes' to execute this script."
+fi
+echo "#"
+echo "#================================================================================"
+echo
+echo
 
 
-echo "#------------------------------------------------------------"
-echo "# Switch context for kubectl"
-echo "#------------------------------------------------------------"
+
 echo "kubectl config use-context ${NAME}"
+if [ "${RUN}" -eq "1" ]; then
+	kubectl config use-context ${NAME}
+fi

@@ -33,6 +33,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 |` kops_default_worker_min_size`       | `1`            | Minimum number of worker nodes per instance group |
 |` kops_default_worker_max_size`       | `3`            | Maximum number of worker nodes per instance group |
 |` kops_default_worker_vol_size`       | `200`          | Root volume size in GB for each worker node |
+| `kops_default_ssh_pub_key`           | undefined      | Public ssh key for create cluster scripts |
 | `kops_default_build_directory`       | `build`        | Template generation directory |
 
 ## Example definition
@@ -65,6 +66,7 @@ kops_cluster:
     region: eu-central-1
     image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
     s3_bucket_name: playground-cluster-shop-state-store
+	ssh_pup_key: "ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk"
     api_access:
       - 185.28.180.95/32
     ssh_access:
