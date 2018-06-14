@@ -15,7 +15,7 @@
         val: "{{ cluster.region | default(kops_default_region) }}{{ az }}.{{ cluster.name }}"
       - key: "tag:SubnetType"
         val: Private
-      - key: "tag:kubernetes.io/cluster/{{ default_kops_cluster_name }}"
+      - key: "tag:kubernetes.io/cluster/{{ cluster.name }}"
         val: shared
       - key: "tag:kubernetes.io/role/internal-elb"
         val: "1"

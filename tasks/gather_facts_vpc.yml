@@ -4,7 +4,7 @@
     kops_vpc_filters:
       - key: "tag:Name"
         val: "{{ cluster.name }}"
-      - key: "tag:kubernetes.io/cluster/{{ default_kops_cluster_name }}"
+      - key: "tag:kubernetes.io/cluster/{{ cluster.name }}"
         val: shared
 
 - name: gather vpc facts
