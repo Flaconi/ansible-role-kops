@@ -7,6 +7,8 @@
 - name: set utility subnet filter
   set_fact:
     kops_subnet_utility_filters:
+      - key: state
+        val: available
       - key: vpc-id
         val: "{{ kops_vpc_id }}"
       - key: availability-zone
@@ -45,6 +47,8 @@
 - name: set NAT GW filter
   set_fact:
     kops_subnet_utility_nat_filters:
+      - key: state
+        val: available
       - key: vpc-id
         val: "{{ kops_vpc_id }}"
       - key: subnet-id

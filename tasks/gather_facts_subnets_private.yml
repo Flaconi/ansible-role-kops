@@ -7,6 +7,8 @@
 - name: set private subnet filter
   set_fact:
     kops_subnet_private_filters:
+      - key: state
+        val: available
       - key: vpc-id
         val: "{{ kops_vpc_id }}"
       - key: availability-zone

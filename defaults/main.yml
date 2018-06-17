@@ -16,7 +16,6 @@ kops_default_api_access:
 kops_default_ssh_access:
   - 0.0.0.0/32
 
-
 ###
 ### Infrastructure defines
 ###
