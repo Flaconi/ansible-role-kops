@@ -21,14 +21,28 @@ jobs:
       install:
         - sudo pip install yamllint
       script:
-        - yamllint .
+        - make lint
 
     ###
     ### Stage 2: Run Ansible
     ###
+
+    # Job 1: Ansible 2.5
     - stage: test ansible
       install:
         - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get update; then break; else i=$((i+1)); fi done
         - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce; then break; else i=$((i+1)); fi done
+      env:
+        - ANSIBLE_VERSION=2.5
       script:
-        - docker run --rm -it -v $PWD:/etc/ansible/roles/rolename --workdir /etc/ansible/roles/rolename/tests flaconi/ansible:${ANSIBLE_VERSION} ./support/run-tests.sh
+        - make test ANSIBLE_VERSION=${ANSIBLE_VERSION}
+
+    # Job 1: Ansible latest
+    - stage: test ansible
+      install:
+        - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get update; then break; else i=$((i+1)); fi done
+        - max=100; i=0; while [ $i -lt $max ]; do if sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce; then break; else i=$((i+1)); fi done
+      env:
+        - ANSIBLE_VERSION=latest
+      script:
+        - make test ANSIBLE_VERSION=${ANSIBLE_VERSION}
