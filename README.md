@@ -17,7 +17,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 | Variable                             | Default                       | Description                  |
 |--------------------------------------|-------------------------------|------------------------------|
 | `kops_profile`                       | undefined      | Boto profule name to be used |
-| `kops_default_version`               | `v1.10.2`      | Kubernetes Cluster version |
+| `kops_default_version`               | `v1.10.4`      | Kubernetes Cluster version |
 | `kops_default_region`                | `eu-central-1` | Default region to use |
 | `kops_default_image`                 | `kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08` | Default AMI to use. [See here for other AMIs'](https://github.com/kubernetes/kops/blob/master/channels/stable) |
 | `kops_default_api_access`            | `[0.0.0.0/32]` | Array of allowed IP's to access the API from |
@@ -61,7 +61,7 @@ Instead of using somebody's sane defaults, you can also fully customize your clu
 ```yml
 kops_cluster:
   - name: playground-cluster-shop.k8s.local
-    version: v1.10.2
+    version: v1.10.4
     type: private
     region: eu-central-1
     image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
