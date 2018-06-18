@@ -48,6 +48,12 @@
     state: directory
     path: "{{ kops_default_build_directory}}/{{ cluster.name }}"
 
+- name: generate ssh-key.pub
+  template:
+    src: ssh-key.pub.j2
+    dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/ssh-key.pub"
+    mode: 0644
+
 - name: generate cluster.yml
   template:
     src: cluster.yml.j2

@@ -1,38 +1,106 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -e
 set -u
 set -o pipefail
 
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
 NAME="{{ cluster.name }}"
 KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}"
 
+RUN=0
+{% raw %}
+if [ "${#}" -gt "0" ] && [ "${1}" = "--yes" ]; then
+{% endraw %}
+	RUN=1
+fi
+
+echo
+echo
+echo "#================================================================================"
+echo "#"
+echo "#   C R E A T E   K O P S   C L U S T E R"
+echo "#"
+if [ "${RUN}" -eq "1" ]; then
+	echo "#   !!! EXECUTING COMMANDS !!!"
+else
+	echo "#   NOTES: RUN WITH '--yes' to execute this script."
+fi
+echo "#"
+echo "#================================================================================"
+echo
+echo
+
+
 
 echo "#------------------------------------------------------------"
-echo "# Create KOPS templates"
+echo "# 1/4 Create Cluster configuration"
 echo "#------------------------------------------------------------"
+
 echo "kops create --state ${KOPS_STATE_STORE} -f cluster.yml"
+if [ "${RUN}" -eq "1" ]; then
+	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/cluster.yml"
+fi
+
 echo "kops create --state ${KOPS_STATE_STORE} -f ig-master.yml"
+if [ "${RUN}" -eq "1" ]; then
+	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-master.yml"
+fi
+
 echo "kops create --state ${KOPS_STATE_STORE} -f ig-worker.yml"
+if [ "${RUN}" -eq "1" ]; then
+	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-worker.yml"
+fi
+
+echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i ./ssh-key.pub"
+if [ "${RUN}" -eq "1" ]; then
+	kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i "${SCRIPTPATH}/ssh-key.pub"
+fi
 echo
 
-echo "#------------------------------------------------------------"
-echo "# Create SSH key"
-echo "#------------------------------------------------------------"
-echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i /path/to/shared/ssh/key.pub"
-echo
+
 
 echo "#------------------------------------------------------------"
-echo "# Apply"
+echo "# 2/4 Roll out Cluster configuration"
 echo "#------------------------------------------------------------"
+
 echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+if [ "${RUN}" -eq "1" ]; then
+	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}
+fi
+
 echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
+if [ "${RUN}" -eq "1" ]; then
+	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes
+fi
 echo
 
 
+
 echo "#------------------------------------------------------------"
-echo "# Add Bastion host"
+echo "# 3/4 Create Bastion host configuration"
 echo "#------------------------------------------------------------"
+
 echo "kops create --state ${KOPS_STATE_STORE} -f ig-bastion.yml"
+if [ "${RUN}" -eq "1" ]; then
+	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-bastion.yml"
+fi
+echo
+
+
+
+echo "#------------------------------------------------------------"
+echo "# 4/4 Roll out Bastion host configuration"
+echo "#------------------------------------------------------------"
+
 echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+if [ "${RUN}" -eq "1" ]; then
+	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}
+fi
+
 echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
+if [ "${RUN}" -eq "1" ]; then
+	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes
+fi
+echo

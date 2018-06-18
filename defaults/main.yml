@@ -4,7 +4,7 @@
 ### General Kubernetes defines
 ###
 
-kops_default_version: v1.10.3
+kops_default_version: v1.10.4
 
 kops_default_region: eu-central-1
 
@@ -15,7 +15,6 @@ kops_default_api_access:
 
 kops_default_ssh_access:
   - 0.0.0.0/32
-
 
 ###
 ### Infrastructure defines

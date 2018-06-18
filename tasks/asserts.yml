@@ -10,6 +10,14 @@
       - cluster.name | length > 0
     msg: "Cluster 'name' is not defined, but required"
 
+- name: ensure cluster ssh key is defined
+  assert:
+    that:
+      - >-
+        (cluster.ssh_pup_key is defined and cluster.ssh_pup_key | length > 0) or
+        (kops_default_ssh_pub_key is defined and kops_default_ssh_pub_key | length > 0)
+    msg: "Cluster 'ssh_pub_key' or kops_default_ssh_pub_key is not defined, but one of them is required"
+
 - name: ensure cluster s3 bucket name is defined
   assert:
     that:

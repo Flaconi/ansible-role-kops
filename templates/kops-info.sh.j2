@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -e
 set -u
@@ -7,8 +7,31 @@ set -o pipefail
 NAME="{{ cluster.name }}"
 KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}"
 
+RUN=0
+{% raw %}
+if [ "${#}" -gt "0" ] && [ "${1}" = "--yes" ]; then
+{% endraw %}
+	RUN=1
+fi
 
-echo "#------------------------------------------------------------"
-echo "# Info"
-echo "#------------------------------------------------------------"
+echo
+echo
+echo "#================================================================================"
+echo "#"
+echo "#   K O P S   C L U S T E R   I N F O"
+echo "#"
+if [ "${RUN}" -eq "1" ]; then
+	echo "#   !!! EXECUTING COMMANDS !!!"
+else
+	echo "#   NOTES: RUN WITH '--yes' to execute this script."
+fi
+echo "#"
+echo "#================================================================================"
+echo
+echo
+
+
 echo "kops validate cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+if [ "${RUN}" -eq "1" ]; then
+	kops validate cluster --state ${KOPS_STATE_STORE} --name ${NAME}
+fi

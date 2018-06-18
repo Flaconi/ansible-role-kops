@@ -17,7 +17,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 | Variable                             | Default                       | Description                  |
 |--------------------------------------|-------------------------------|------------------------------|
 | `kops_profile`                       | undefined      | Boto profule name to be used |
-| `kops_default_version`               | `v1.10.2`      | Kubernetes Cluster version |
+| `kops_default_version`               | `v1.10.4`      | Kubernetes Cluster version |
 | `kops_default_region`                | `eu-central-1` | Default region to use |
 | `kops_default_image`                 | `kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08` | Default AMI to use. [See here for other AMIs'](https://github.com/kubernetes/kops/blob/master/channels/stable) |
 | `kops_default_api_access`            | `[0.0.0.0/32]` | Array of allowed IP's to access the API from |
@@ -33,6 +33,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 |` kops_default_worker_min_size`       | `1`            | Minimum number of worker nodes per instance group |
 |` kops_default_worker_max_size`       | `3`            | Maximum number of worker nodes per instance group |
 |` kops_default_worker_vol_size`       | `200`          | Root volume size in GB for each worker node |
+| `kops_default_ssh_pub_key`           | undefined      | Public ssh key for create cluster scripts |
 | `kops_default_build_directory`       | `build`        | Template generation directory |
 
 ## Example definition
@@ -60,11 +61,12 @@ Instead of using somebody's sane defaults, you can also fully customize your clu
 ```yml
 kops_cluster:
   - name: playground-cluster-shop.k8s.local
-    version: v1.10.2
+    version: v1.10.4
     type: private
     region: eu-central-1
     image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
     s3_bucket_name: playground-cluster-shop-state-store
+    ssh_pup_key: "ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk"
     api_access:
       - 185.28.180.95/32
     ssh_access:
@@ -96,4 +98,25 @@ kops_cluster:
         max_size: 3
         volume_size: 200
         availability_zones: [c]
+```
+
+
+## Testing
+
+#### Requirements
+
+* Docker
+* [yamllint](https://github.com/adrienverge/yamllint)
+
+#### Run tests
+
+```bash
+# Lint the source files
+make lint
+
+# Run integration tests with default Ansible version
+make test
+
+# Run integration tests with custom Ansible version
+make test ANSIBLE_VERSION=2.4
 ```
