@@ -16,6 +16,32 @@ if [ "${#}" -gt "0" ] && [ "${1}" = "--yes" ]; then
 	RUN=1
 fi
 
+{# Start of AWS Account check #}
+{% if kops_default_aws_account_limit | length > 0 %}
+if [ "${RUN}" -eq "1" ]; then
+	if ! command -v aws >/dev/null 2>&1; then
+		>&2 echo "Error, aws binary not available but required to check for correct AWS account."
+		exit 1
+	fi
+	if ! AWS_ACCOUNT="$( aws sts get-caller-identity --output text --query 'Account' )"; then
+		>&2 echo "Error, 'aws sts get-caller-identity' failed."
+		exit 1
+	fi
+	FOUND=0
+{% for acc in kops_default_aws_account_limit %}
+	if [ "${AWS_ACCOUNT}" = "{{ acc }}" ]; then
+		FOUND=1
+	fi
+{% endfor %}
+	if [ "${FOUND}" -ne "1" ]; then
+		echo "Error, ${AWS_ACCOUNT} is not allowed."
+		exit 1
+	fi
+fi
+{% endif %}
+{# End of AWS Account check #}
+
+
 echo
 echo
 echo "#================================================================================"

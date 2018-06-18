@@ -35,6 +35,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 |` kops_default_worker_vol_size`       | `200`          | Root volume size in GB for each worker node |
 | `kops_default_ssh_pub_key`           | undefined      | Public ssh key for create cluster scripts |
 | `kops_default_build_directory`       | `build`        | Template generation directory |
+| `kops_default_aws_account_limit`     | `[]`           | Limit generated cluster shell scripts to only run for the specified accounts to prevent accidental roll-out in wrong environment. |
 
 ## Example definition
 
@@ -59,6 +60,12 @@ kops_cluster:
 Instead of using somebody's sane defaults, you can also fully customize your cluster.
 
 ```yml
+# Generated shell scripts should only run in those AWS accounts.
+# This prevents a user from accidentally rolling it out in wrong environments.
+kops_default_aws_account_limit:
+  - 123456789
+  - 987654321
+
 kops_cluster:
   - name: playground-cluster-shop.k8s.local
     version: v1.10.4
