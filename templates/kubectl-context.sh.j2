@@ -57,7 +57,24 @@ echo
 
 
 
+echo "#------------------------------------------------------------"
+echo "# 1/2 Create Kubernetes config locally"
+echo "#------------------------------------------------------------"
+
+echo "kops export kubecfg --state ${KOPS_STATE_STORE} --name ${NAME}"
+if [ "${RUN}" -eq "1" ]; then
+	kops export kubecfg --state ${KOPS_STATE_STORE} --name ${NAME}
+fi
+echo
+
+
+
+echo "#------------------------------------------------------------"
+echo "# 2/2 Set Kubernetes default context"
+echo "#------------------------------------------------------------"
+
 echo "kubectl config use-context ${NAME}"
 if [ "${RUN}" -eq "1" ]; then
 	kubectl config use-context ${NAME}
 fi
+echo
