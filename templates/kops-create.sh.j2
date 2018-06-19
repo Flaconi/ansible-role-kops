@@ -61,7 +61,7 @@ echo
 
 
 echo "#------------------------------------------------------------"
-echo "# 1/4 Create Cluster configuration"
+echo "# 1/4 Create Kops configuration on S3"
 echo "#------------------------------------------------------------"
 
 echo "kops create --state ${KOPS_STATE_STORE} -f cluster.yml"
@@ -105,7 +105,7 @@ echo
 
 
 echo "#------------------------------------------------------------"
-echo "# 3/4 Create Bastion host configuration"
+echo "# 3/4 Create Kops Bastion host configuration on S3"
 echo "#------------------------------------------------------------"
 
 echo "kops create --state ${KOPS_STATE_STORE} -f ig-bastion.yml"
