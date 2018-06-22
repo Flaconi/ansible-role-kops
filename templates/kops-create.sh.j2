@@ -61,7 +61,7 @@ echo
 
 
 echo "#------------------------------------------------------------"
-echo "# 1/4 Create Kops configuration on S3"
+echo "# 1/2 Create Kops configuration on S3"
 echo "#------------------------------------------------------------"
 
 echo "kops create --state ${KOPS_STATE_STORE} -f cluster.yml"
@@ -69,14 +69,9 @@ if [ "${RUN}" -eq "1" ]; then
 	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/cluster.yml"
 fi
 
-echo "kops create --state ${KOPS_STATE_STORE} -f ig-master.yml"
+echo "kops create --state ${KOPS_STATE_STORE} -f instance-groups.yml"
 if [ "${RUN}" -eq "1" ]; then
-	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-master.yml"
-fi
-
-echo "kops create --state ${KOPS_STATE_STORE} -f ig-worker.yml"
-if [ "${RUN}" -eq "1" ]; then
-	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-worker.yml"
+	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/instance-groups.yml"
 fi
 
 echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i ./ssh-key.pub"
@@ -88,36 +83,7 @@ echo
 
 
 echo "#------------------------------------------------------------"
-echo "# 2/4 Roll out Cluster configuration"
-echo "#------------------------------------------------------------"
-
-echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
-if [ "${RUN}" -eq "1" ]; then
-	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}
-fi
-
-echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
-if [ "${RUN}" -eq "1" ]; then
-	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes
-fi
-echo
-
-
-
-echo "#------------------------------------------------------------"
-echo "# 3/4 Create Kops Bastion host configuration on S3"
-echo "#------------------------------------------------------------"
-
-echo "kops create --state ${KOPS_STATE_STORE} -f ig-bastion.yml"
-if [ "${RUN}" -eq "1" ]; then
-	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-bastion.yml"
-fi
-echo
-
-
-
-echo "#------------------------------------------------------------"
-echo "# 4/4 Roll out Bastion host configuration"
+echo "# 2/2 Roll out Cluster configuration"
 echo "#------------------------------------------------------------"
 
 echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
