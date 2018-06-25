@@ -81,19 +81,16 @@ if [ "${RUN}" -eq "1" ]; then
 	kops replace --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/cluster.yml"
 fi
 
-echo "kops replace --state ${KOPS_STATE_STORE} -f ig-master.yml"
+echo "kops replace --state ${KOPS_STATE_STORE} -f instance-groups.yml"
 if [ "${RUN}" -eq "1" ]; then
-	kops replace --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-master.yml"
+	kops replace --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/instance-groups.yml"
 fi
 
-echo "kops replace --state ${KOPS_STATE_STORE} -f ig-worker.yml"
+echo "kops delete secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin"
+echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i ./ssh-key.pub"
 if [ "${RUN}" -eq "1" ]; then
-	kops replace --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-worker.yml"
-fi
-
-echo "kops replace --state ${KOPS_STATE_STORE} -f ig-bastion.yml"
-if [ "${RUN}" -eq "1" ]; then
-	kops replace --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/ig-bastion.yml"
+	kops delete secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin
+	kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i "${SCRIPTPATH}/ssh-key.pub"
 fi
 echo
 

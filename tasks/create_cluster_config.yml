@@ -48,34 +48,22 @@
     state: directory
     path: "{{ kops_default_build_directory}}/{{ cluster.name }}"
 
-- name: generate ssh-key.pub
-  template:
-    src: ssh-key.pub.j2
-    dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/ssh-key.pub"
-    mode: 0644
-
 - name: generate cluster.yml
   template:
     src: cluster.yml.j2
     dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/cluster.yml"
     mode: 0644
 
-- name: generate ig-master.yml
+- name: generate instance-groups.yml
   template:
-    src: ig-master.yml.j2
-    dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/ig-master.yml"
+    src: instance-groups.yml.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/instance-groups.yml"
     mode: 0644
 
-- name: generate ig-worker.yml
+- name: generate ssh-key.pub
   template:
-    src: ig-worker.yml.j2
-    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/ig-worker.yml"
-    mode: 0644
-
-- name: generate ig-bastion.yml
-  template:
-    src: ig-bastion.yml.j2
-    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/ig-bastion.yml"
+    src: ssh-key.pub.j2
+    dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/ssh-key.pub"
     mode: 0644
 
 - name: generate kops-create.sh

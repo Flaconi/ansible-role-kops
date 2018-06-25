@@ -1,0 +1,97 @@
+{# ========================================================================= #}
+{# BASTION HOST INSTANCE GROUP                                               #}
+{# ========================================================================= #}
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{ cluster.name }}
+  name: bastions
+spec:
+  image: {{ cluster.image | default(kops_default_image) }}
+  machineType: {% if 'bastion' in cluster and 'instance_type' in cluster.bastion %}{{ cluster.bastion.instance_type }}{% else %}{{ kops_default_bastion_instance_type }}{% endif %}
+
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: bastions
+  role: Bastion
+  subnets:
+{% for subnet in kops_utility_subnets %}
+{% set availability_zones = cluster.bastion.az if 'bastion' in cluster and 'az' in cluster.bastion else kops_default_bastion_az %}
+{% for az in availability_zones %}
+{% set str = cluster.region | default(kops_default_region) + az %}
+{% if str == kops_utility_subnets[subnet].az %}
+    - utility-{{ str }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{# ========================================================================= #}
+{# WORKER INSTANCE GROUPS                                                    #}
+{# ========================================================================= #}
+{% for worker in cluster.workers %}
+{% set machine_type = worker.instance_type | default(kops_default_worker_instance_type) %}
+{% set worker_az = worker.az | default(kops_default_worker_az) %}
+{% set worker_ig = machine_type | replace('.', '') + worker_az | join('') %}
+{% set min_size = worker.min_size | default(kops_default_worker_min_size) %}
+{% set max_size = worker.max_size | default(kops_default_worker_max_size) %}
+{% set root_volume_size = worker.vol_size | default(kops_default_worker_vol_size) %}
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{ cluster.name }}
+  name: {{ worker.name }}
+spec:
+  image: {{ cluster.image | default(kops_default_image) }}
+  machineType: {{ machine_type }}
+  maxSize: {{ max_size }}
+  minSize: {{ min_size }}
+  nodeLabels:
+    kops.k8s.io/instancegroup: {{ worker_ig }}
+  role: Node
+  rootVolumeSize: {{ root_volume_size }}
+  subnets:
+{% for az in worker_az %}
+    - {{ cluster.region | default(kops_default_region) }}{{ az }}
+{% endfor %}
+
+{% endfor %}
+
+{# ========================================================================= #}
+{# MASTER INSTANCE GROUPS                                                    #}
+{# ========================================================================= #}
+{% set master_cnt = cluster.master.count if 'master' in cluster and 'count' in cluster.master else kops_default_master_count %}
+{% set master_azs = cluster.master.az if 'master' in cluster and 'az' in cluster.master else kops_default_master_az %}
+{% for n in range(0, master_cnt) %}
+{# mod operation #}
+{% set index = n % (master_azs | length) %}
+{% set curr_az = master_azs[index] %}
+{% set subnet = kops_private_subnets[curr_az] %}
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: {{ cluster.name }}
+  name: master-{{ subnet.az }}
+spec:
+  image: {{ cluster.image | default(kops_default_image) }}
+  machineType: {% if 'master' in cluster and 'instance_type' in cluster.master %}{{ cluster.master.instance_type }}{% else %}{{ kops_default_master_instance_type }}{% endif %}
+
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-{{ subnet.az }}
+  role: Master
+  subnets:
+    - {{ subnet.az }}
+
+{% endfor %}
