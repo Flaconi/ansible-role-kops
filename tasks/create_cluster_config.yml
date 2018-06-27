@@ -95,3 +95,58 @@
     src: kubectl-context.sh.j2
     dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kubectl-context.sh"
     mode: 0755
+
+- name: diff generated cluster config against remote state store
+  diff:
+    source: "{{ lookup('template', 'cluster.yml.j2') }}"
+    target: |
+      {% if kops_aws_profile %}
+      # If using boto_profile, make kops aware of it
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+      {% endif %}
+      # Don't fail to show that remote has nothing yet
+      kops get cluster -o yaml \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} || true
+    source_type: string
+    target_type: command
+    diff: yaml
+    diff_yaml_ignore: ['creationTimestamp']
+  check_mode: False
+
+- name: diff generated instance group config against remote state store
+  diff:
+    source: "{{ lookup('template', 'instance-groups.yml.j2') }}"
+    target: |
+      {% if kops_aws_profile %}
+      # If using boto_profile, make kops aware of it
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+      {% endif %}
+      # Don't fail to show that remote has nothing yet
+      kops get instancegroups -o yaml \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} || true
+    source_type: string
+    target_type: command
+    diff: yaml
+    diff_yaml_ignore: ['creationTimestamp']
+  check_mode: False
+
+- name: diff ssh public key against remote state store
+  diff:
+    source: |
+      ssh-keygen -lE md5 -f {{ kops_default_build_directory}}/{{ cluster.name }}/ssh-key.pub \
+        | awk '{ print $2}' | sed 's/^MD5://gi'
+    target: |
+      {% if kops_aws_profile %}
+      # If using boto_profile, make kops aware of it
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+      {% endif %}
+      # Don't fail to show that remote has nothing yet
+      kops get secret admin --type SSHPublicKey -o table \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} \
+        | grep -Eo "[:a-f0-9]{16,}" || true
+    source_type: command
+    target_type: command
+  check_mode: False
