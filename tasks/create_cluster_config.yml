@@ -135,7 +135,7 @@
 - name: diff ssh public key against remote state store
   diff:
     source: |
-      ssh-keygen -lE md5 -f {{ kops_default_build_directory}}/{{ cluster.name }}/ssh-key.pub \
+      bash -c "ssh-keygen -lE md5 -f <(echo '{{ lookup('template', 'ssh-key.pub.j2') }}')" \
         | awk '{ print $2}' | sed 's/^MD5://g'
     target: |
       {% if kops_aws_profile %}
