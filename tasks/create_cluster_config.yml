@@ -136,7 +136,7 @@
   diff:
     source: |
       ssh-keygen -lE md5 -f {{ kops_default_build_directory}}/{{ cluster.name }}/ssh-key.pub \
-        | awk '{ print $2}' | sed 's/^MD5://gi'
+        | awk '{ print $2}' | sed 's/^MD5://g'
     target: |
       {% if kops_aws_profile %}
       # If using boto_profile, make kops aware of it
