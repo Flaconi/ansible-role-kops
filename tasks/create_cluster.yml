@@ -1,0 +1,52 @@
+---
+
+###
+### Assert defaults and cluster overwrites
+###
+- include_tasks: asserts.yml
+
+
+###
+### Empty array variables for each loop iteration
+###
+- set_fact:
+    kops_utility_subnets: []
+    kops_private_subnets: []
+
+
+###
+### Gather facts about existing infrastructure
+###
+
+# Returns:
+# * kops_vpc_cidr
+# * kops_vpc_id
+- include_tasks: gather_facts_vpc.yml
+
+# Returns:
+# * kops_utility_subnets
+- include_tasks: gather_facts_subnets_utility.yml
+  loop_control:
+    loop_var: az
+  with_items:
+    - "{{ cluster.az | default(kops_default_az) }}"
+
+# Returns:
+# * kops_private_subnets
+- include_tasks: gather_facts_subnets_private.yml
+  loop_control:
+    loop_var: az
+  with_items:
+    - "{{ cluster.az | default(kops_default_az) }}"
+
+
+###
+### Generate templates
+###
+- include_tasks: generate_templates.yml
+
+
+###
+### Run kops
+###
+- include_tasks: run_kops.yml

@@ -1,0 +1,122 @@
+---
+
+###
+### Diff State Store
+###
+- name: diff generated cluster config against remote state store
+  diff:
+    source: "{{ lookup('template', 'cluster.yml.j2') }}"
+    target: |
+      {% if kops_aws_profile %}
+      # If using boto_profile, make kops aware of it
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+      {% endif %}
+      # Don't fail to show that remote has nothing yet
+      kops get cluster -o yaml \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} || true
+    source_type: string
+    target_type: command
+    diff: yaml
+    diff_yaml_ignore: ['creationTimestamp']
+  check_mode: False
+  register: _kops_diff_cluster
+
+- name: diff generated instance group config against remote state store
+  diff:
+    source: "{{ lookup('template', 'instance-groups.yml.j2') }}"
+    target: |
+      {% if kops_aws_profile %}
+      # If using boto_profile, make kops aware of it
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+      {% endif %}
+      # Don't fail to show that remote has nothing yet
+      kops get instancegroups -o yaml \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} || true
+    source_type: string
+    target_type: command
+    diff: yaml
+    diff_yaml_ignore: ['creationTimestamp']
+  check_mode: False
+  register: _kops_diff_instancegroups
+
+- name: diff ssh public key against remote state store
+  diff:
+    source: |
+      # Test SSH key for validity
+      if ! bash -c "ssh-keygen -lf <(echo '{{ lookup('template', 'ssh-key.pub.j2') }}')" >/dev/null; then
+        exit 1;
+      fi
+      # Get SSH key fingerprint only
+      bash -c "ssh-keygen -lE md5 -f <(echo '{{ lookup('template', 'ssh-key.pub.j2') }}')" \
+        | awk '{ print $2}' | sed 's/^MD5://g'
+    target: |
+      {% if kops_aws_profile %}
+      # If using boto_profile, make kops aware of it
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+      {% endif %}
+      # Don't fail to show that remote has nothing yet
+      kops get secret admin --type SSHPublicKey -o table \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} \
+        | grep -Eo "[:a-f0-9]{16,}" || true
+    source_type: command
+    target_type: command
+  check_mode: False
+  register: _kops_diff_sshkey
+
+
+###
+### Update State Store
+###
+- name: update state store for cluster spec
+  shell: |
+    {% if kops_aws_profile %}
+    # If using boto_profile, make kops aware of it
+    export AWS_PROFILE="{{ kops_aws_profile }}";
+    {% endif %}
+    kops replace -v 9 --force \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      -f <(echo "{{ lookup('template', 'cluster.yml.j2') }}")
+  args:
+    executable: bash
+  when:
+    - _kops_diff_cluster['changed']
+
+- name: update state store for instance groups
+  shell: |
+    {% if kops_aws_profile %}
+    # If using boto_profile, make kops aware of it
+    export AWS_PROFILE="{{ kops_aws_profile }}";
+    {% endif %}
+    kops replace -v 9 --force \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      -f <(echo "{{ lookup('template', 'instance-groups.yml.j2') }}")
+  args:
+    executable: bash
+  when:
+    - _kops_diff_instancegroups['changed']
+
+- name: update state store for ssh public key
+  shell: |
+    {% if kops_aws_profile %}
+    # If using boto_profile, make kops aware of it
+    export AWS_PROFILE="{{ kops_aws_profile }}";
+    {% endif %}
+    # Delete first
+    kops delete -v 9 secret \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      sshpublickey admin || true;
+    # Re-create
+    kops create -v 9 secret \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      sshpublickey admin -i <(echo "{{ lookup('template', 'ssh-key.pub.j2') }}")
+  args:
+    executable: bash
+  when:
+    - _kops_diff_sshkey['changed']
