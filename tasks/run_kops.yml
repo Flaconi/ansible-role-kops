@@ -84,6 +84,8 @@
     executable: bash
   when:
     - _kops_diff_cluster['changed']
+    - kops_update is defined
+    - kops_update == 'state'
 
 - name: update state store for instance groups
   shell: |
@@ -99,6 +101,8 @@
     executable: bash
   when:
     - _kops_diff_instancegroups['changed']
+    - kops_update is defined
+    - kops_update == 'state'
 
 - name: update state store for ssh public key
   shell: |
@@ -120,3 +124,5 @@
     executable: bash
   when:
     - _kops_diff_sshkey['changed']
+    - kops_update is defined
+    - kops_update == 'state'
