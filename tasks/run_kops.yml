@@ -20,7 +20,7 @@
     diff: yaml
     diff_yaml_ignore: ['creationTimestamp']
   check_mode: False
-  register: _kops_diff_cluster
+  register: _kops_diff_state_cluster
 
 - name: diff generated instance group config against remote state store
   diff:
@@ -39,7 +39,7 @@
     diff: yaml
     diff_yaml_ignore: ['creationTimestamp']
   check_mode: False
-  register: _kops_diff_instancegroups
+  register: _kops_diff_state_instancegroups
 
 - name: diff ssh public key against remote state store
   diff:
@@ -64,7 +64,7 @@
     source_type: command
     target_type: command
   check_mode: False
-  register: _kops_diff_sshkey
+  register: _kops_diff_state_sshkey
 
 
 ###
@@ -83,9 +83,9 @@
   args:
     executable: bash
   when:
-    - _kops_diff_cluster['changed']
+    - _kops_diff_state_cluster['changed']
     - kops_update is defined
-    - kops_update == 'state'
+    - kops_update == 'state' or kops_update == 'all'
 
 - name: update state store for instance groups
   shell: |
@@ -100,9 +100,9 @@
   args:
     executable: bash
   when:
-    - _kops_diff_instancegroups['changed']
+    - _kops_diff_state_instancegroups['changed']
     - kops_update is defined
-    - kops_update == 'state'
+    - kops_update == 'state' or kops_update == 'all'
 
 - name: update state store for ssh public key
   shell: |
