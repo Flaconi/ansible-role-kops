@@ -123,6 +123,42 @@
   args:
     executable: bash
   when:
-    - _kops_diff_sshkey['changed']
+    - _kops_diff_state_sshkey['changed']
     - kops_update is defined
-    - kops_update == 'state'
+    - kops_update == 'state' or kops_update == 'all'
+
+
+###
+### Update Cluster
+###
+- name: diff kubernetes updates
+  shell: |
+    {% if kops_aws_profile %}
+    # If using boto_profile, make kops aware of it
+    export AWS_PROFILE="{{ kops_aws_profile }}";
+    {% endif %}
+    if ! stdout="$( kops update cluster \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} )"; then \
+      exit 1;
+    else
+      echo "${stdout}" | grep -E '^[[:space:]]+[+-][[:space:]]' || true
+    fi
+  check_mode: False
+  register: _kops_diff_cluster_update
+  changed_when: "_kops_diff_cluster_update.stdout != ''"
+
+- name: update kubernetes cluster
+  shell: |
+    {% if kops_aws_profile %}
+    # If using boto_profile, make kops aware of it
+    export AWS_PROFILE="{{ kops_aws_profile }}";
+    {% endif %}
+    kops update cluster \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      --yes
+  when:
+    - _kops_diff_cluster_update['changed']
+    - kops_update is defined
+    - kops_update == 'update' or kops_update == 'all'
