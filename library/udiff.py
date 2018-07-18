@@ -23,12 +23,12 @@ ANSIBLE_METADATA = {'metadata_version': '2.0',
 
 DOCUMENTATION = '''
 ---
-module: diff
+module: udiff
 author: cytopia (@cytopia)
 
-short_description: Diff compare strings, files or command outputs in raw or file specific normalized version.
+short_description: udiff compare strings, files or command outputs in raw or file specific normalized version.
 description:
-    - Diff compare a string, file or command output against a string file or command output.
+    - udiff compare a string, file or command output against a string file or command output.
     - Check mode is only supported when diffing strings or files, commands will only be executed in actual run.
     - More examples at U(https://github.com/cytopia/ansible-module-diff)
 version_added: "2.4"
@@ -83,28 +83,28 @@ options:
 
 EXAMPLES = '''
 # Diff compare two strings
-- diff:
+- udiff:
     source: "foo"
     target: "bar"
     source_type: string
     target_type: string
 
 # Diff compare variable against template file (as strings)
-- diff:
+- udiff:
     source: "{{ lookup('template', tpl.yml.j2) }}"
     target: "{{ my_var }}"
     source_type: string
     target_type: string
 
 # Diff compare string against command output
-- diff:
+- udiff:
     source: "/bin/bash"
     target: "which bash"
     source_type: string
     target_type: command
 
 # Diff compare file against command output
-- diff:
+- udiff:
     source: "/etc/hostname"
     target: "hostname"
     source_type: file
@@ -112,7 +112,7 @@ EXAMPLES = '''
 
 # Diff compare two normalized yaml files (sorted keys and comments stripped),
 # but additionally ignore the yaml keys: 'creationTimestamp' and 'metadata'
-- diff:
+- udiff:
     source: /tmp/file-1.yml
     target: /tmp/file-2.yml
     source_type: file
@@ -124,7 +124,7 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-diff:
+udiff:
     description: diff output
     returned: success
     type: string
@@ -294,7 +294,7 @@ def diff_module_validation(module):
         if not os.access(b_source, os.R_OK):
             module.fail_json(msg="source %s not readable" % (source))
         if os.path.isdir(b_source):
-            module.fail_json(msg="diff does not support recursive diff of directory: %s" % (source))
+            module.fail_json(msg="udiff does not support recursive diff of directory: %s" % (source))
 
     # Validate target
     if target_type == 'file':
@@ -304,7 +304,7 @@ def diff_module_validation(module):
         if not os.access(b_target, os.R_OK):
             module.fail_json(msg="target %s not readable" % (target))
         if os.path.isdir(b_target):
-            module.fail_json(msg="diff does not support recursive diff of directory: %s" % (target))
+            module.fail_json(msg="udiff does not support recursive diff of directory: %s" % (target))
 
     return module
 

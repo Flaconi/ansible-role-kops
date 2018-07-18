@@ -4,7 +4,7 @@
 ### Diff State Store
 ###
 - name: diff generated cluster config against remote state store
-  diff:
+  udiff:
     source: "{{ lookup('template', 'cluster.yml.j2') }}"
     target: |
       {% if kops_aws_profile %}
@@ -23,7 +23,7 @@
   register: _kops_diff_state_cluster
 
 - name: diff generated instance group config against remote state store
-  diff:
+  udiff:
     source: "{{ lookup('template', 'instance-groups.yml.j2') }}"
     target: |
       {% if kops_aws_profile %}
@@ -42,7 +42,7 @@
   register: _kops_diff_state_instancegroups
 
 - name: diff ssh public key against remote state store
-  diff:
+  udiff:
     source: |
       # Test SSH key for validity
       if ! bash -c "ssh-keygen -lf <(echo '{{ lookup('template', 'ssh-key.pub.j2') }}')" >/dev/null; then
