@@ -138,6 +138,7 @@
     export AWS_PROFILE="{{ kops_aws_profile }}";
     {% endif %}
     if ! stdout="$( kops update cluster \
+      --create-kube-config=false \
       --state s3://{{ cluster.s3_bucket_name }} \
       --name {{ cluster.name }} )"; then \
       exit 1;
@@ -155,6 +156,7 @@
     export AWS_PROFILE="{{ kops_aws_profile }}";
     {% endif %}
     kops update cluster \
+      --create-kube-config=false \
       --state s3://{{ cluster.s3_bucket_name }} \
       --name {{ cluster.name }} \
       --yes
