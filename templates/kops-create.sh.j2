@@ -64,14 +64,14 @@ echo "#------------------------------------------------------------"
 echo "# 1/2 Create Kops configuration on S3"
 echo "#------------------------------------------------------------"
 
-echo "kops create --state ${KOPS_STATE_STORE} -f cluster.yml"
+echo "kops create --state ${KOPS_STATE_STORE} --name ${NAME} -f cluster.yml"
 if [ "${RUN}" -eq "1" ]; then
-	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/cluster.yml"
+	kops create --state ${KOPS_STATE_STORE} --name ${NAME} -f "${SCRIPTPATH}/cluster.yml"
 fi
 
-echo "kops create --state ${KOPS_STATE_STORE} -f instance-groups.yml"
+echo "kops create --state ${KOPS_STATE_STORE} --name ${NAME} -f instance-groups.yml"
 if [ "${RUN}" -eq "1" ]; then
-	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/instance-groups.yml"
+	kops create --state ${KOPS_STATE_STORE} --name ${NAME} -f "${SCRIPTPATH}/instance-groups.yml"
 fi
 
 echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i ./ssh-key.pub"

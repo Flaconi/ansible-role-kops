@@ -81,9 +81,9 @@ if [ "${RUN}" -eq "1" ]; then
 	kops replace --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/cluster.yml"
 fi
 
-echo "kops replace --state ${KOPS_STATE_STORE} -f instance-groups.yml"
+echo "kops replace --state ${KOPS_STATE_STORE} --name ${NAME} -f instance-groups.yml"
 if [ "${RUN}" -eq "1" ]; then
-	kops replace --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/instance-groups.yml"
+	kops replace --state ${KOPS_STATE_STORE} --name ${NAME} -f "${SCRIPTPATH}/instance-groups.yml"
 fi
 
 echo "kops delete secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin"
