@@ -86,13 +86,13 @@ echo "#------------------------------------------------------------"
 echo "# 2/2 Roll out Cluster configuration"
 echo "#------------------------------------------------------------"
 
-echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --create-kube-config=false"
 if [ "${RUN}" -eq "1" ]; then
-	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}
+	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --create-kube-config=false
 fi
 
-echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --create-kube-config=false --yes"
 if [ "${RUN}" -eq "1" ]; then
-	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes
+	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --create-kube-config=false --yes
 fi
 echo
