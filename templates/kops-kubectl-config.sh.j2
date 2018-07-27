@@ -44,7 +44,7 @@ echo
 echo
 echo "#================================================================================"
 echo "#"
-echo "#   S W I T C H   K U B E C T L   C O N T E X T"
+echo "#   G E T   K U B E C T L   C O N F I G"
 echo "#"
 if [ "${RUN}" -eq "1" ]; then
 	echo "#   !!! EXECUTING COMMANDS !!!"
@@ -59,11 +59,11 @@ echo
 
 
 echo "#------------------------------------------------------------"
-echo "# 1/1 Set Kubernetes default context"
+echo "# 1/1 Create Kubernetes config locally"
 echo "#------------------------------------------------------------"
 
-echo "kubectl config use-context ${NAME}"
+echo "kops export kubecfg --state ${KOPS_STATE_STORE} --name ${NAME}"
 if [ "${RUN}" -eq "1" ]; then
-	kubectl config use-context ${NAME}
+	kops export kubecfg --state ${KOPS_STATE_STORE} --name ${NAME}
 fi
 echo

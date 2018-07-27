@@ -105,13 +105,13 @@ echo "#------------------------------------------------------------"
 echo "# 3/3 Rolling Update Kops cluster"
 echo "#------------------------------------------------------------"
 
-echo "kops rolling-update cluster --state ${KOPS_STATE_STORE} --create-kube-config=false --name ${NAME}"
+echo "kops rolling-update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
 if [ "${RUN}" -eq "1" ]; then
-	kops rolling-update cluster --state ${KOPS_STATE_STORE} --create-kube-config=false --name ${NAME}
+	kops rolling-update cluster --state ${KOPS_STATE_STORE} --name ${NAME}
 fi
 
-echo "kops rolling-update cluster --state ${KOPS_STATE_STORE} --create-kube-config=false --name ${NAME} --yes"
+echo "kops rolling-update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
 if [ "${RUN}" -eq "1" ]; then
-	kops rolling-update cluster --state ${KOPS_STATE_STORE} --create-kube-config=false --name ${NAME} --yes
+	kops rolling-update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes
 fi
 echo
