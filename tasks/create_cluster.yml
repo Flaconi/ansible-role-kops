@@ -45,7 +45,6 @@
 ###
 - include_tasks: generate_templates.yml
 
-
 ###
 ### Run kops
 ###

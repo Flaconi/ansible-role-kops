@@ -24,9 +24,9 @@ When using this role it will simply generate the kops configuration files as wel
 to deploy each defined cluster. You can also choose to use Ansible to provision kops. This can be done for
 multiple different stage as defined below:
 
-| Variable      | Default   | Choices                                             |
-|---------------|-----------|-----------------------------------------------------|
-| `kops_update` | undefined | `state` `update`, `all`, `rolling`, `force-rolling` |
+| Variable      | Default   | Choices                 |
+|---------------|-----------|-------------------------|
+| `kops_update` | undefined | `state` `update`, `all` |
 
 **Note:** As this role is fully dry-run capable you should use it in the following order for
 productionized stacks:
@@ -35,7 +35,6 @@ productionized stacks:
 2. Run state store update
 3. Dry run to see cluster update differences
 4. Run cluster update
-5. Optionally run rolling update
 
 #### Update the state store
 
@@ -59,18 +58,6 @@ In order to both apply state store updates in S3 and then update the cluster acc
 to add the following variable to your Ansible command:
 ```
 -e kops_update=all
-```
-
-#### Rolling update
-
-Sometimes it is necessary to perform rolling updates, this can be achieved by adding the following
-variables to your Ansible command:
-```
-# Normal rolling update
--e kops_update=rolling
-
-# Force rolling update
--e kops_update=force-rolling
 ```
 
 

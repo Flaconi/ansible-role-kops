@@ -21,6 +21,9 @@
     diff_yaml_ignore: ['creationTimestamp']
   check_mode: False
   register: _kops_diff_state_cluster
+  when:
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
 - name: diff generated instance group config against remote state store
   udiff:
@@ -40,6 +43,9 @@
     diff_yaml_ignore: ['creationTimestamp']
   check_mode: False
   register: _kops_diff_state_instancegroups
+  when:
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
 - name: diff ssh public key against remote state store
   udiff:
@@ -65,6 +71,9 @@
     target_type: command
   check_mode: False
   register: _kops_diff_state_sshkey
+  when:
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
 
 ###
@@ -85,7 +94,7 @@
   when:
     - _kops_diff_state_cluster['changed']
     - kops_update is defined
-    - kops_update == 'state' or kops_update == 'all'
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
 - name: update state store for instance groups
   shell: |
@@ -102,7 +111,7 @@
   when:
     - _kops_diff_state_instancegroups['changed']
     - kops_update is defined
-    - kops_update == 'state' or kops_update == 'all'
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
 - name: update state store for ssh public key
   shell: |
@@ -125,7 +134,7 @@
   when:
     - _kops_diff_state_sshkey['changed']
     - kops_update is defined
-    - kops_update == 'state' or kops_update == 'all'
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
 
 ###
@@ -148,6 +157,9 @@
   check_mode: False
   register: _kops_diff_cluster_update
   changed_when: "_kops_diff_cluster_update.stdout != ''"
+  when:
+    - kops_update is defined
+    - kops_update == 'update' or kops_update == 'all'
 
 - name: update kubernetes cluster
   shell: |
