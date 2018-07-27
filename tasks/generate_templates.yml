@@ -35,10 +35,10 @@
     dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-update.sh"
     mode: 0755
 
-- name: generate kops-info.sh
+- name: generate kops-validate.sh
   template:
-    src: kops-info.sh.j2
-    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-info.sh"
+    src: kops-validate.sh.j2
+    dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kops-validate.sh"
     mode: 0755
 
 - name: generate kops-delete.sh
