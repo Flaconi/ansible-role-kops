@@ -58,4 +58,3 @@
     src: kubectl-context.sh.j2
     dest: "{{ kops_default_build_directory }}/{{ cluster.name }}/kubectl-context.sh"
     mode: 0755
-
