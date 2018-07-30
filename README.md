@@ -126,7 +126,7 @@ kops_cluster:
     region: eu-central-1
     image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
     s3_bucket_name: playground-cluster-shop-state-store
-    ssh_pup_key: ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk
+    ssh_pub_key: ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk
     api_access:
       - 185.28.180.95/32
     ssh_access:

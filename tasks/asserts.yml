@@ -14,7 +14,7 @@
   assert:
     that:
       - >-
-        (cluster.ssh_pup_key is defined and cluster.ssh_pup_key | length > 0) or
+        (cluster.ssh_pub_key is defined and cluster.ssh_pub_key | length > 0) or
         (kops_default_ssh_pub_key is defined and kops_default_ssh_pub_key | length > 0)
     msg: "Cluster 'ssh_pub_key' or kops_default_ssh_pub_key is not defined, but one of them is required"
 
