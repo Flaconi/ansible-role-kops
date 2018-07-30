@@ -22,7 +22,7 @@ must be explicitly stated.
 
 When using this role it will simply generate the kops configuration files as well as shell scripts
 to deploy each defined cluster. You can also choose to use Ansible to provision kops. This can be done for
-multiple different stage as defined below:
+multiple different stages as defined below:
 
 | Variable      | Default   | Choices                 |
 |---------------|-----------|-------------------------|
