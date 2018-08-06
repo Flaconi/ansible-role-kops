@@ -34,7 +34,7 @@ if [ "${RUN}" -eq "1" ]; then
 	fi
 {% endfor %}
 	if [ "${FOUND}" -ne "1" ]; then
-		echo "Error, ${AWS_ACCOUNT} is not allowed."
+		>&2 echo "Error, ${AWS_ACCOUNT} is not allowed."
 		exit 1
 	fi
 fi
