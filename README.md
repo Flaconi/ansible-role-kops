@@ -1,6 +1,12 @@
 # Kops
 
-handles the generation of Kops configuration files
+This Ansible role handles the generation of Kops configuration files and optionally also
+updating kops state store as well as creating or updating the cluster.
+
+Full dry-run is supported.
+
+**Note:** By default only configuration files are created, actual state store or cluster actions
+must be explicitly stated.
 
 [![Build Status](https://travis-ci.org/Flaconi/ansible-role-kops.svg?branch=master)](https://travis-ci.org/Flaconi/ansible-role-kops)
 [![Version](https://img.shields.io/github/tag/Flaconi/ansible-role-kops.svg)](https://github.com/Flaconi/ansible-role-kops/tags)
@@ -9,13 +15,58 @@ handles the generation of Kops configuration files
 ## Requirements
 
 * Ansible 2.5
+* Python lib: [pyaml](https://github.com/yaml/pyyaml)
+* Binary: [kops](https://github.com/kubernetes/kops/blob/master/docs/install.md)
+
+## Run-time variables
+
+When using this role it will simply generate the kops configuration files as well as shell scripts
+to deploy each defined cluster. You can also choose to use Ansible to provision kops. This can be done for
+multiple different stages as defined below:
+
+| Variable      | Default   | Choices                 |
+|---------------|-----------|-------------------------|
+| `kops_update` | undefined | `state` `update`, `all` |
+
+**Note:** As this role is fully dry-run capable you should use it in the following order for
+productionized stacks:
+
+1. Dry run to see state store differences
+2. Run state store update
+3. Dry run to see cluster update differences
+4. Run cluster update
+
+#### Update the state store
+
+In order to update Kops' state store in S3, you need to add the following variable to your Ansible
+command:
+```
+-e kops_update=state
+```
+
+#### Update the Cluster
+
+In order to apply all settings from the state store to the cluster, you need to add the following
+variables to your Ansible command:
+```
+-e kops_update=update
+```
+
+#### Update the state store and the cluster afterwards
+
+In order to both apply state store updates in S3 and then update the cluster accordingly, you need
+to add the following variable to your Ansible command:
+```
+-e kops_update=all
+```
+
 
 ## Additional variables
 
 Additional variables that can be used (either as `host_vars`/`group_vars` or via command line args):
 
-| Variable                             | Default                       | Description                  |
-|--------------------------------------|-------------------------------|------------------------------|
+| Variable                             | Default        | Description                  |
+|--------------------------------------|----------------|------------------------------|
 | `kops_profile`                       | undefined      | Boto profule name to be used |
 | `kops_default_version`               | `v1.10.4`      | Kubernetes Cluster version |
 | `kops_default_region`                | `eu-central-1` | Default region to use |
@@ -47,6 +98,8 @@ When using the sane defaults, the only thing to configure for each cluster is
 * its worker nodes
 
 ```yml
+kops_default_ssh_pub_key: ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk
+
 kops_cluster:
   - name: playground-cluster-shop.k8s.local
     s3_bucket_name: playground-cluster-shop-state-store
@@ -73,7 +126,7 @@ kops_cluster:
     region: eu-central-1
     image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
     s3_bucket_name: playground-cluster-shop-state-store
-    ssh_pup_key: "ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk"
+    ssh_pub_key: ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk
     api_access:
       - 185.28.180.95/32
     ssh_access:

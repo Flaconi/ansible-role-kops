@@ -5,7 +5,7 @@ set -u
 set -o pipefail
 
 NAME="{{ cluster.name }}"
-KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}"
+export KOPS_STATE_STORE="s3://{{ cluster.s3_bucket_name }}"
 
 RUN=0
 {% raw %}
@@ -44,7 +44,7 @@ echo
 echo
 echo "#================================================================================"
 echo "#"
-echo "#   D E L E T E   K O P S   C L U S T E R"
+echo "#   G E T   K U B E C T L   C O N F I G"
 echo "#"
 if [ "${RUN}" -eq "1" ]; then
 	echo "#   !!! EXECUTING COMMANDS !!!"
@@ -59,16 +59,11 @@ echo
 
 
 echo "#------------------------------------------------------------"
-echo "# 1/1 Delete Kubernetes cluster"
+echo "# 1/1 Create Kubernetes config locally"
 echo "#------------------------------------------------------------"
 
-echo "kops delete cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops export kubecfg --state ${KOPS_STATE_STORE} --name ${NAME}"
 if [ "${RUN}" -eq "1" ]; then
-	kops delete cluster --state ${KOPS_STATE_STORE} --name ${NAME}
-fi
-
-echo "kops delete cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
-if [ "${RUN}" -eq "1" ]; then
-	kops delete cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes
+	kops export kubecfg --state ${KOPS_STATE_STORE} --name ${NAME}
 fi
 echo

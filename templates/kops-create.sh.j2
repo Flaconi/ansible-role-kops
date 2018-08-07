@@ -34,7 +34,7 @@ if [ "${RUN}" -eq "1" ]; then
 	fi
 {% endfor %}
 	if [ "${FOUND}" -ne "1" ]; then
-		echo "Error, ${AWS_ACCOUNT} is not allowed."
+		>&2 echo "Error, ${AWS_ACCOUNT} is not allowed."
 		exit 1
 	fi
 fi
@@ -64,14 +64,14 @@ echo "#------------------------------------------------------------"
 echo "# 1/2 Create Kops configuration on S3"
 echo "#------------------------------------------------------------"
 
-echo "kops create --state ${KOPS_STATE_STORE} -f cluster.yml"
+echo "kops create --state ${KOPS_STATE_STORE} --name ${NAME} -f cluster.yml"
 if [ "${RUN}" -eq "1" ]; then
-	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/cluster.yml"
+	kops create --state ${KOPS_STATE_STORE} --name ${NAME} -f "${SCRIPTPATH}/cluster.yml"
 fi
 
-echo "kops create --state ${KOPS_STATE_STORE} -f instance-groups.yml"
+echo "kops create --state ${KOPS_STATE_STORE} --name ${NAME} -f instance-groups.yml"
 if [ "${RUN}" -eq "1" ]; then
-	kops create --state ${KOPS_STATE_STORE} -f "${SCRIPTPATH}/instance-groups.yml"
+	kops create --state ${KOPS_STATE_STORE} --name ${NAME} -f "${SCRIPTPATH}/instance-groups.yml"
 fi
 
 echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} sshpublickey admin -i ./ssh-key.pub"
@@ -86,13 +86,13 @@ echo "#------------------------------------------------------------"
 echo "# 2/2 Roll out Cluster configuration"
 echo "#------------------------------------------------------------"
 
-echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --create-kube-config=false"
 if [ "${RUN}" -eq "1" ]; then
-	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME}
+	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --create-kube-config=false
 fi
 
-echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes"
+echo "kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --create-kube-config=false --yes"
 if [ "${RUN}" -eq "1" ]; then
-	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --yes
+	kops update cluster --state ${KOPS_STATE_STORE} --name ${NAME} --create-kube-config=false --yes
 fi
 echo

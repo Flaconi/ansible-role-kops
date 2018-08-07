@@ -32,7 +32,7 @@ if [ "${RUN}" -eq "1" ]; then
 	fi
 {% endfor %}
 	if [ "${FOUND}" -ne "1" ]; then
-		echo "Error, ${AWS_ACCOUNT} is not allowed."
+		>&2 echo "Error, ${AWS_ACCOUNT} is not allowed."
 		exit 1
 	fi
 fi
@@ -59,19 +59,7 @@ echo
 
 
 echo "#------------------------------------------------------------"
-echo "# 1/2 Create Kubernetes config locally"
-echo "#------------------------------------------------------------"
-
-echo "kops export kubecfg --state ${KOPS_STATE_STORE} --name ${NAME}"
-if [ "${RUN}" -eq "1" ]; then
-	kops export kubecfg --state ${KOPS_STATE_STORE} --name ${NAME}
-fi
-echo
-
-
-
-echo "#------------------------------------------------------------"
-echo "# 2/2 Set Kubernetes default context"
+echo "# 1/1 Set Kubernetes default context"
 echo "#------------------------------------------------------------"
 
 echo "kubectl config use-context ${NAME}"

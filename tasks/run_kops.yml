@@ -1,0 +1,194 @@
+---
+
+###
+### Diff State Store
+###
+- name: diff generated cluster config against remote state store
+  udiff:
+    source: "{{ lookup('template', 'cluster.yml.j2') }}"
+    target: |
+      # If using boto_profile, make kops aware of it
+      if [ -n "${BOTO_PROFILE}" ]; then
+        export AWS_PROFILE="${BOTO_PROFILE}";
+      fi
+      # Don't fail to show that remote has nothing yet
+      kops get cluster -o yaml \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} || true
+    source_type: string
+    target_type: command
+    diff: yaml
+    diff_yaml_ignore: ['creationTimestamp']
+  check_mode: False
+  register: _kops_diff_state_cluster
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+- name: diff generated instance group config against remote state store
+  udiff:
+    source: "{{ lookup('template', 'instance-groups.yml.j2') }}"
+    target: |
+      # If using boto_profile, make kops aware of it
+      if [ -n "${BOTO_PROFILE}" ]; then
+        export AWS_PROFILE="{{ kops_aws_profile }}";
+      fi
+      # Don't fail to show that remote has nothing yet
+      kops get instancegroups -o yaml \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} || true
+    source_type: string
+    target_type: command
+    diff: yaml
+    diff_yaml_ignore: ['creationTimestamp']
+  check_mode: False
+  register: _kops_diff_state_instancegroups
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+- name: diff ssh public key against remote state store
+  udiff:
+    source: |
+      # Test SSH key for validity
+      if ! bash -c "ssh-keygen -lf <(echo '{{ lookup('template', 'ssh-key.pub.j2') }}')" >/dev/null; then
+        exit 1;
+      fi
+      # Get SSH key fingerprint only
+      bash -c "ssh-keygen -lE md5 -f <(echo '{{ lookup('template', 'ssh-key.pub.j2') }}')" \
+        | awk '{ print $2}' | sed 's/^MD5://g'
+    target: |
+      # If using boto_profile, make kops aware of it
+      if [ -n "${BOTO_PROFILE}" ]; then
+        export AWS_PROFILE="{{ kops_aws_profile }}";
+      fi
+      # Don't fail to show that remote has nothing yet
+      kops get secret admin --type SSHPublicKey -o table \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} \
+        | grep -Eo "[:a-f0-9]{16,}" || true
+    source_type: command
+    target_type: command
+  check_mode: False
+  register: _kops_diff_state_sshkey
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+
+###
+### Update State Store
+###
+- name: update state store for cluster spec
+  shell: |
+    # If using boto_profile, make kops aware of it
+    if [ -n "${BOTO_PROFILE}" ]; then
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+    fi
+    kops replace -v 9 --force \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      -f <(echo "{{ lookup('template', 'cluster.yml.j2') }}")
+  args:
+    executable: bash
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - _kops_diff_state_cluster['changed']
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+- name: update state store for instance groups
+  shell: |
+    # If using boto_profile, make kops aware of it
+    if [ -n "${BOTO_PROFILE}" ]; then
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+    fi
+    kops replace -v 9 --force \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      -f <(echo "{{ lookup('template', 'instance-groups.yml.j2') }}")
+  args:
+    executable: bash
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - _kops_diff_state_instancegroups['changed']
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+- name: update state store for ssh public key
+  shell: |
+    # If using boto_profile, make kops aware of it
+    if [ -n "${BOTO_PROFILE}" ]; then
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+    fi
+    # Delete first
+    kops delete -v 9 secret \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      sshpublickey admin || true;
+    # Re-create
+    kops create -v 9 secret \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      sshpublickey admin -i <(echo "{{ lookup('template', 'ssh-key.pub.j2') }}")
+  args:
+    executable: bash
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - _kops_diff_state_sshkey['changed']
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+
+###
+### Update Cluster
+###
+- name: diff kubernetes updates
+  shell: |
+    # If using boto_profile, make kops aware of it
+    if [ -n "${BOTO_PROFILE}" ]; then
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+    fi
+    if ! stdout="$( kops update cluster \
+      --create-kube-config=false \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} )"; then \
+      exit 1;
+    else
+      echo "${stdout}" | grep -E '^[[:space:]]+[+-][[:space:]]' || true
+    fi
+  check_mode: False
+  register: _kops_diff_cluster_update
+  changed_when: "_kops_diff_cluster_update.stdout != ''"
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - kops_update is defined
+    - kops_update == 'update' or kops_update == 'all'
+
+- name: update kubernetes cluster
+  shell: |
+    # If using boto_profile, make kops aware of it
+    if [ -n "${BOTO_PROFILE}" ]; then
+      export AWS_PROFILE="{{ kops_aws_profile }}";
+    fi
+    kops update cluster \
+      --create-kube-config=false \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      --yes
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - _kops_diff_cluster_update['changed']
+    - kops_update is defined
+    - kops_update == 'update' or kops_update == 'all'

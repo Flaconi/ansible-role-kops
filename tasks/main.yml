@@ -3,7 +3,7 @@
 ###
 ### Main entrypoint
 ###
-- include_tasks: create_cluster_config.yml
+- include_tasks: create_cluster.yml
   loop_control:
     loop_var: cluster
   with_items:
