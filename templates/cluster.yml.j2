@@ -15,6 +15,7 @@ spec:
   docker:
     insecureRegistry: 100.64.0.0/10
     logDriver: ""
+  kubeAPIServer: "{{ cluster.kube_api_server }}"
   etcdClusters:
     - etcdMembers:
 {# Start of var definition #}
@@ -50,7 +51,7 @@ spec:
     - {{ ip }}
 {% endfor %}
   kubernetesVersion: {{ cluster.version | default(kops_default_version) }}
-  masterPublicName: api.{{ cluster.name }}
+  masterPublicName: {{ cluster.masterPublicName }}
   networkCIDR: {{ kops_vpc_cidr }}
   networkID: {{ kops_vpc_id }}
   networking:

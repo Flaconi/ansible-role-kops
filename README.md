@@ -121,6 +121,14 @@ kops_default_aws_account_limit:
 
 kops_cluster:
   - name: playground-cluster-shop.k8s.local
+    masterPublicName: api-playground-cluster-shop.example.net
+    kube_api_server:
+      oidcIssuerURL: https://oidc.example.net
+      oidcClientID: clientID
+      oidcUsernameClaim: email
+      oidcUsernamePrefix: "oidc:"
+      oidcGroupsClaim: groups
+      oidcGroupsPrefix: "oidc:"
     version: v1.10.4
     type: private
     region: eu-central-1
