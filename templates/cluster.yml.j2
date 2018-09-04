@@ -53,7 +53,7 @@ spec:
     - {{ ip }}
 {% endfor %}
   kubernetesVersion: {{ cluster.version | default(kops_default_version) }}
-  masterPublicName: {{ cluster.masterPublicName | default('api.' + cluster.name) }}
+  masterPublicName: {{ cluster.master_public_name | default('api.' + cluster.name) }}
   networkCIDR: {{ kops_vpc_cidr }}
   networkID: {{ kops_vpc_id }}
   networking:
