@@ -15,8 +15,9 @@ spec:
   docker:
     insecureRegistry: 100.64.0.0/10
     logDriver: ""
-{% if 'kube_api_server' in cluster %}
-  kubeAPIServer: "{{ cluster.kube_api_server }}"
+{% if 'kube_api_server' in cluster and cluster.kube_api_server %}
+  kubeAPIServer:
+{{ cluster.kube_api_server | to_nice_yaml(indent=2) | indent(width=4, indentfirst=True) }}
 {% endif %}
   etcdClusters:
     - etcdMembers:
