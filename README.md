@@ -68,7 +68,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 | Variable                             | Default        | Description                  |
 |--------------------------------------|----------------|------------------------------|
 | `kops_profile`                       | undefined      | Boto profule name to be used |
-| `kops_default_version`               | `v1.10.4`      | Kubernetes Cluster version |
+| `kops_default_version`               | `v1.10.7`      | Kubernetes Cluster version |
 | `kops_default_region`                | `eu-central-1` | Default region to use |
 | `kops_default_image`                 | `kope.io/k8s-1.9-debian-jessie-amd64-hvm-ebs-2018-03-11` | Default AMI to use. [See here for other AMIs'](https://github.com/kubernetes/kops/blob/master/channels/stable) |
 | `kops_default_api_access`            | `[0.0.0.0/32]` | Array of allowed IP's to access the API from |
