@@ -54,6 +54,11 @@ spec:
   minSize: {{ min_size }}
   nodeLabels:
     kops.k8s.io/instancegroup: {{ worker_ig }}
+{% if worker.node_labels is defined %}
+{% for label in worker.node_labels %}
+    {{ label.key }}: {{ label.val }}
+{% endfor %}
+{% endif %}
   role: Node
   rootVolumeSize: {{ root_volume_size }}
   subnets:

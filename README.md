@@ -183,6 +183,11 @@ kops_cluster:
         max_size: 3
         volume_size: 200
         availability_zones: [c]
+        node_labels:
+          - key: name
+            val: some-fancy-name
+          - key: purpose
+            value: something-important
 ```
 
 
