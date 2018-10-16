@@ -18,6 +18,19 @@ spec:
   kubeAPIServer:
 {{ cluster.kube_api_server | to_nice_yaml(indent=2) | indent(width=4, indentfirst=True) }}
 {% endif %}
+{% if 'additionalPolicies' in cluster and cluster.additionalPolicies and
+  ( 'node' in cluster.additionalPolicies and cluster.additionalPolicies.node or
+  'master' in cluster.additionalPolicies and cluster.additionalPolicies.master ) %}
+  additionalPolicies:
+{% if 'node' in cluster.additionalPolicies and cluster.additionalPolicies.node %}
+    node: |
+{{ cluster.additionalPolicies.node | from_json | to_nice_json(indent=2) | indent(width=6, indentfirst=True) }}
+{% endif %}
+{% if 'master' in cluster.additionalPolicies and cluster.additionalPolicies.master %}
+    master: |
+{{ cluster.additionalPolicies.master | from_json | to_nice_json(indent=2) | indent(width=6, indentfirst=True) }}
+{% endif %}
+{% endif %}
   etcdClusters:
     - etcdMembers:
 {# Start of var definition #}

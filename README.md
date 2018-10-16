@@ -129,6 +129,23 @@ kops_cluster:
       oidcUsernamePrefix: "oidc:"
       oidcGroupsClaim: groups
       oidcGroupsPrefix: "oidc:"
+    additionalPolicies:
+        node: |
+          [
+            {
+              "Effect": "Allow",
+              "Action": ["route53:*"],
+              "Resource": ["*"]
+            }
+          ]
+        master: |
+          [
+            {
+              "Effect": "Allow",
+              "Action": ["route53:*"],
+              "Resource": ["*"]
+            }
+          ]
     version: v1.10.4
     type: private
     region: eu-central-1
