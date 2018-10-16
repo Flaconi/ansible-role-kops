@@ -94,7 +94,7 @@
     kops replace -v 9 --force \
       --state s3://{{ cluster.s3_bucket_name }} \
       --name {{ cluster.name }} \
-      -f <(echo "{{ lookup('template', 'cluster.yml.j2') }}")
+      -f {{ kops_default_build_directory }}/{{ cluster.name }}/cluster.yml
   args:
     executable: bash
   environment:
@@ -113,7 +113,7 @@
     kops replace -v 9 --force \
       --state s3://{{ cluster.s3_bucket_name }} \
       --name {{ cluster.name }} \
-      -f <(echo "{{ lookup('template', 'instance-groups.yml.j2') }}")
+      -f {{ kops_default_build_directory }}/{{ cluster.name }}/instance-groups.yml
   args:
     executable: bash
   environment:
