@@ -72,6 +72,8 @@ kops_default_worker_vol_size: 200
 # named after the cluster. Overwrite to specify a custom location
 kops_default_build_directory: build
 
+# Enable AWS IAM authenticator
+kops_default_aws_iam_authenticator_enabled: false
 
 ###
 ### Cluster array definition (See README.md)
