@@ -170,7 +170,7 @@ def pop_recursive(dictionary, keys):
     # make sure the_keys is a set to get O(1) lookups
     #if type(keys) is not set:
     #    keys = set(keys)
-    for key, val in dictionary.items():
+    for key, val in dictionary.copy().items():
         if key in keys:
             del dictionary[key]
         if isinstance(val, dict):
