@@ -33,7 +33,7 @@
     target: |
       # If using boto_profile, make kops aware of it
       if [ -n "${BOTO_PROFILE}" ]; then
-        export AWS_PROFILE="{{ kops_aws_profile }}";
+        export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
       fi
       # Don't fail to show that remote has nothing yet
       kops get instancegroups -o yaml \
@@ -64,7 +64,7 @@
     target: |
       # If using boto_profile, make kops aware of it
       if [ -n "${BOTO_PROFILE}" ]; then
-        export AWS_PROFILE="{{ kops_aws_profile }}";
+        export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
       fi
       # Don't fail to show that remote has nothing yet
       kops get secret admin --type SSHPublicKey -o table \
@@ -89,7 +89,7 @@
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
-      export AWS_PROFILE="{{ kops_aws_profile }}";
+      export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
     fi
     kops replace -v 9 --force \
       --state s3://{{ cluster.s3_bucket_name }} \
@@ -108,7 +108,7 @@
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
-      export AWS_PROFILE="{{ kops_aws_profile }}";
+      export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
     fi
     kops replace -v 9 --force \
       --state s3://{{ cluster.s3_bucket_name }} \
@@ -127,7 +127,7 @@
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
-      export AWS_PROFILE="{{ kops_aws_profile }}";
+      export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
     fi
     # Delete first
     kops delete -v 9 secret \
@@ -156,7 +156,7 @@
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
-      export AWS_PROFILE="{{ kops_aws_profile }}";
+      export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
     fi
     if ! stdout="$( kops update cluster \
       --create-kube-config=false \
@@ -179,7 +179,7 @@
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
-      export AWS_PROFILE="{{ kops_aws_profile }}";
+      export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
     fi
     kops update cluster \
       --create-kube-config=false \
