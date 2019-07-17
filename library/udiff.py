@@ -150,20 +150,13 @@ def shell_exec(command):
     cpt = subprocess.Popen(command, shell=True,
                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    output = []
-    for line in iter(cpt.stdout.readline, ''):
-        output.append(line)
-
-    # Wait until process terminates (without using p.wait())
-    while cpt.poll() is None:
-        # Process hasn't exited yet, let's wait some
-        time.sleep(0.5)
+    stdout, stderr = cpt.communicate()
 
     # Get return code from process
     return_code = cpt.returncode
 
     # Return code and output
-    return return_code, ''.join(output)
+    return return_code, to_bytes(stdout).decode("utf-8")
 
 
 def pop_recursive(dictionary, keys):
