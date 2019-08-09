@@ -7,12 +7,12 @@ spec:
   api:
     loadBalancer:
       type: Public
-  {% set aws_iam_authenticator_enabled = cluster.aws_iam_authenticator_enabled if 'aws_iam_authenticator_enabled' in cluster else kops_default_aws_iam_authenticator_enabled %}
-  {% if aws_iam_authenticator_enabled == true %}
+{% set aws_iam_authenticator_enabled = cluster.aws_iam_authenticator_enabled if 'aws_iam_authenticator_enabled' in cluster else kops_default_aws_iam_authenticator_enabled %}
+{% if aws_iam_authenticator_enabled == true %}
   # Enable AWS IAM Authenticator
   authentication:
     aws: {}
-  {% endif %}
+{% endif %}
   authorization:
     rbac: {}
   channel: stable
