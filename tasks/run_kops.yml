@@ -175,6 +175,16 @@
     - kops_update is defined
     - kops_update == 'update' or kops_update == 'all'
 
+- name: show diffed kubernetes updates
+  debug:
+    msg: "{{ (_kops_diff_cluster_update.stdout_lines | join('\\n') | regex_replace('\\t', '')).split('\\n') }}"
+  check_mode: False
+  changed_when: "_kops_diff_cluster_update.stdout != ''"
+  when:
+    - kops_update is defined
+    - kops_update == 'update' or kops_update == 'all'
+    - _kops_diff_cluster_update.stdout_lines is defined
+
 - name: update kubernetes cluster
   shell: |
     # If using boto_profile, make kops aware of it
