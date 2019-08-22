@@ -61,6 +61,12 @@ spec:
 {% endif %}
   role: Node
   rootVolumeSize: {{ root_volume_size }}
+{% if worker.taints is defined %}
+  taints:
+{% for taint in worker.taints %}
+    - {{ taint }}
+{% endfor %}
+{% endif %}
   subnets:
 {% for az in worker_az %}
     - {{ cluster.region | default(kops_default_region) }}{{ az }}
