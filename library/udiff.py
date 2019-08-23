@@ -131,17 +131,108 @@ udiff:
     sample: + this line was added
 '''
 
+# -------------------------------------------------------------------------------------------------
+# IMPORTS
+# -------------------------------------------------------------------------------------------------
+#pylint: disable=wrong-import-position
+
 # Python default imports
+import copy
 import os
-import time
 import re
 import subprocess
-import yaml
+from ruamel.yaml import YAML
+from ruamel.yaml.compat import StringIO
+import ruamel.yaml
 
 # Python Ansible imports
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes
 
+
+# -------------------------------------------------------------------------------------------------
+# CLASSES
+# -------------------------------------------------------------------------------------------------
+
+class MyYaml(object):
+    '''ruamel based Yaml class'''
+
+    def __str2yml(self, string):
+        '''Safely load yaml'''
+        yaml = YAML()
+        try:
+            return yaml.load(string)
+        except Exception as exc:
+            # We might already have yaml
+            return string
+
+    def __fixyml(self, data):
+        '''
+        This function iterates through an already loaded yaml (dict)
+        variable recursively and converts any inline yaml/json strings
+        to correct python dicts.
+        '''
+
+        # It's a dict, so recurse
+        if isinstance(data, dict):
+            d = dict()
+            for key, val in data.items():
+                d[key] = self.__fixyml(val)
+            return d
+        # It's a list, so recurse
+        elif isinstance(data, list):
+            l = list()
+            for key in data:
+                l.append(self.__fixyml(key))
+            return l
+        # It's a string or inline dict/list/json
+        else:
+            k = self.__str2yml(data)
+            if isinstance(k, dict):
+                d = dict()
+                for key, val in k.items():
+                    d[key] = self.__fixyml(val)
+                return d
+            elif isinstance(k, list):
+                l = list()
+                for key in k:
+                    l.append(self.__fixyml(key))
+                return l
+            elif k is None:
+                k = ''
+
+            return k
+
+    def load(self, string):
+        '''Load string into yaml (python dict)'''
+        data = self.__str2yml(string)
+        data = self.__fixyml(data)
+        return data
+
+    def dump(self, data):
+        '''return yaml string from python dict'''
+        yaml = YAML()
+        yaml.indent(mapping=4, sequence=6, offset=3)
+        stream = StringIO()
+        ruamel.yaml.safe_dump(data, stream, default_flow_style=False)
+        return stream.getvalue()
+
+    def split(self, string):
+        '''
+        Split a string, which contains multiple yaml definitions separated by '---'
+        into a list of strings containing single yaml strings per item.
+        '''
+        sections = list()
+
+        for section in re.split("^---$", string, flags=re.MULTILINE):
+            sections.append(section)
+
+        return sections
+
+
+# -------------------------------------------------------------------------------------------------
+# FUNCTIONS
+# -------------------------------------------------------------------------------------------------
 
 def shell_exec(command):
     '''
@@ -170,11 +261,12 @@ def pop_recursive(dictionary, keys):
     # make sure the_keys is a set to get O(1) lookups
     #if type(keys) is not set:
     #    keys = set(keys)
-    for key, val in dictionary.copy().items():
-        if key in keys:
-            del dictionary[key]
-        if isinstance(val, dict):
-            pop_recursive(val, keys)
+    if isinstance(dictionary, dict):
+        for key, val in copy.copy(dictionary).items():
+            if key in keys:
+                del dictionary[key]
+            if isinstance(val, dict):
+                pop_recursive(val, keys)
 
     return dictionary
 
@@ -186,28 +278,37 @@ def normalize_yaml(string, ignore):
     in order for them to not appread in the diff output.
     This function also works with a single yaml file that has multiple --- separators.
     '''
+    yml = MyYaml()
+    sections = list()
 
     # Loop over yaml '---' separators
-    sections = ""
-    for section in re.split("^---$", string, flags=re.MULTILINE):
+    for section in yml.split(string):
         try:
             # Load string into object
-            data = yaml.load(section)
+            data = yml.load(section)
 
             # We have a valid dictionary
             if isinstance(data, dict):
                 data = pop_recursive(data, ignore)
-                data = yaml.dump(data, default_flow_style=False, allow_unicode=True)
             # Convert None object to empty string
             elif data is None:
-                data = ''
+                data = dict()
 
-            # Append sections
-            sections = sections + "\n\n" + data
-        except yaml.YAMLError as exc:
+            # Append yaml sections to list
+            sections.append(data)
+
+        except Exception as exc:
             return (False, exc)
 
-    return (True, sections)
+
+    # Sort the list by keys: metadata.name
+    s_sections = sorted(sections, key=lambda k: k['metadata']['name'])
+
+    output = ''
+    for section in s_sections:
+        output = output + "---\n" + yml.dump(section) + "\n\n"
+
+    return (True, output)
 
 
 def normalize_input(input_data, input_data_name, module):
