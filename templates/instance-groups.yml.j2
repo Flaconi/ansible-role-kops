@@ -52,6 +52,12 @@ spec:
   machineType: {{ machine_type }}
   maxSize: {{ max_size }}
   minSize: {{ min_size }}
+{% if worker.cloud_labels is defined %}
+  cloudLabels:
+{% for label in worker.cloud_labels %}
+    {{ label.key }}: {{ label.val }}
+{% endfor %}
+{% endif %}
   nodeLabels:
     kops.k8s.io/instancegroup: {{ worker_ig }}
 {% if worker.node_labels is defined %}
