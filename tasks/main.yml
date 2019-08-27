@@ -8,3 +8,5 @@
     loop_var: cluster
   with_items:
     - "{{ kops_cluster }}"
+  when:
+    - kops_cluster_name is not defined or (kops_cluster_name is defined and kops_cluster_name == cluster.name)
