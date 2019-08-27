@@ -4,7 +4,7 @@
 ### Gather subnet
 ###
 
-- name: set utility subnet filter
+- name: "({{ cluster.name }}) set utility subnet filter"
   set_fact:
     kops_subnet_utility_filters:
       - key: state
@@ -22,7 +22,7 @@
       - key: "tag:kubernetes.io/role/elb"
         val: "1"
 
-- name: gather utility subnet facts
+- name: "({{ cluster.name }}) gather utility subnet facts"
   ec2_vpc_subnet_facts:
     aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
     aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
@@ -32,7 +32,7 @@
     filters: "{{ kops_subnet_utility_filters | get_attr('key', 'val') }}"
   register: _kops_subnet_utility_facts
 
-- name: fail if not exactly one utility subnet was not found
+- name: "({{ cluster.name }}) fail if not exactly one utility subnet was not found"
   assert:
     that:
       - _kops_subnet_utility_facts.subnets is defined
@@ -44,7 +44,7 @@
 ### Gather NAT GW
 ###
 
-- name: set NAT GW filter
+- name: "({{ cluster.name }}) set NAT GW filter"
   set_fact:
     kops_subnet_utility_nat_filters:
       - key: state
@@ -54,7 +54,7 @@
       - key: subnet-id
         val: "{{ _kops_subnet_utility_facts.subnets[0].id }}"
 
-- name: gather nat gateway by filter
+- name: "({{ cluster.name }}) gather nat gateway by filter"
   ec2_vpc_nat_gateway_facts:
     aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
     aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
@@ -64,7 +64,7 @@
     filters: "{{ kops_subnet_utility_nat_filters | get_attr('key', 'val') }}"
   register: _kops_nat_gw_facts
 
-- name: fail if not exactly one NAT gateway was found by filter
+- name: "({{ cluster.name }}) fail if not exactly one NAT gateway was found by filter"
   assert:
     that:
       - _kops_nat_gw_facts.result is defined
@@ -76,7 +76,7 @@
 ### Set return variable
 ###
 
-- name: set utility dict item
+- name: "({{ cluster.name }}) set utility dict item"
   set_fact:
     kops_utility_item: |
       {{
@@ -90,6 +90,6 @@
         }
       }}
 
-- name: merge utility subnet array
+- name: "({{ cluster.name }}) merge utility subnet array"
   set_fact:
     kops_utility_subnets: "{{ kops_utility_subnets | combine(kops_utility_item) }}"

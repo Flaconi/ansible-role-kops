@@ -3,7 +3,7 @@
 ###
 ### Diff State Store
 ###
-- name: diff generated cluster config against remote state store
+- name: "({{ cluster.name }}) diff generated cluster config against remote state store"
   udiff:
     source: "{{ lookup('template', 'cluster.yml.j2') }}"
     target: |
@@ -27,7 +27,7 @@
     - kops_update is defined
     - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
-- name: diff generated instance group config against remote state store
+- name: "({{ cluster.name }}) diff generated instance group config against remote state store"
   udiff:
     source: "{{ lookup('template', 'instance-groups.yml.j2') }}"
     target: |
@@ -51,7 +51,7 @@
     - kops_update is defined
     - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
-- name: diff ssh public key against remote state store
+- name: "({{ cluster.name }}) diff ssh public key against remote state store"
   udiff:
     source: |
       # Test SSH key for validity
@@ -85,7 +85,7 @@
 ###
 ### Update State Store
 ###
-- name: update state store for cluster spec
+- name: "({{ cluster.name }}) update state store for cluster spec"
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
@@ -104,7 +104,7 @@
     - kops_update is defined
     - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
-- name: update state store for instance groups
+- name: "({{ cluster.name }}) update state store for instance groups"
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
@@ -123,7 +123,7 @@
     - kops_update is defined
     - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
-- name: update state store for ssh public key
+- name: "({{ cluster.name }}) update state store for ssh public key"
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
@@ -152,7 +152,7 @@
 ###
 ### Update Cluster
 ###
-- name: diff kubernetes updates
+- name: "({{ cluster.name }}) diff kubernetes updates"
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
@@ -175,7 +175,7 @@
     - kops_update is defined
     - kops_update == 'update' or kops_update == 'all'
 
-- name: show diffed kubernetes updates
+- name: "({{ cluster.name }}) show diffed kubernetes updates"
   debug:
     msg: "{{ (_kops_diff_cluster_update.stdout_lines | join('\\n') | regex_replace('\\t', '')).split('\\n') }}"
   check_mode: False
@@ -185,7 +185,7 @@
     - kops_update == 'update' or kops_update == 'all'
     - _kops_diff_cluster_update.stdout_lines is defined
 
-- name: update kubernetes cluster
+- name: "({{ cluster.name }}) update kubernetes cluster"
   shell: |
     # If using boto_profile, make kops aware of it
     if [ -n "${BOTO_PROFILE}" ]; then
