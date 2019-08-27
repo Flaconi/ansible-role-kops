@@ -24,9 +24,10 @@ When using this role it will simply generate the kops configuration files as wel
 to deploy each defined cluster. You can also choose to use Ansible to provision kops. This can be done for
 multiple different stages as defined below:
 
-| Variable      | Default   | Choices                 |
-|---------------|-----------|-------------------------|
-| `kops_update` | undefined | `state` `update`, `all` |
+| Variable            | Default   | Choices                 |
+|---------------------|-----------|-------------------------|
+| `kops_update`       | undefined | `state` `update`, `all` |
+| `kops_cluster_name` | undefined | If `kops_cluster` list contains more than one cluster definition, you can limit the roll-out to this specific cluster from the list. (Defined by `kops_cluster[].name`) |
 
 **Note:** As this role is fully dry-run capable you should use it in the following order for
 productionized stacks:
@@ -58,6 +59,14 @@ In order to both apply state store updates in S3 and then update the cluster acc
 to add the following variable to your Ansible command:
 ```
 -e kops_update=all
+```
+
+#### Limit update to a specific cluster
+
+In case your kops_cluster list contains multiple items, you can limit the whole roll-out/dry-run
+to a specific cluster defined by its name:
+```
+-e kops_cluster_name=playground-cluster-shop.k8s.local
 ```
 
 

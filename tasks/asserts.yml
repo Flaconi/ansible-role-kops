@@ -3,14 +3,14 @@
 ###
 ### Validate required defines
 ###
-- name: ensure cluster name is defined
+- name: "({{ cluster.name }}) ensure cluster name is defined"
   assert:
     that:
       - cluster.name is defined
       - cluster.name | length > 0
     msg: "Cluster 'name' is not defined, but required"
 
-- name: ensure cluster ssh key is defined
+- name: "({{ cluster.name }}) ensure cluster ssh key is defined"
   assert:
     that:
       - >-
@@ -18,21 +18,21 @@
         (kops_default_ssh_pub_key is defined and kops_default_ssh_pub_key | length > 0)
     msg: "Cluster 'ssh_pub_key' or kops_default_ssh_pub_key is not defined, but one of them is required"
 
-- name: ensure cluster s3 bucket name is defined
+- name: "({{ cluster.name }}) ensure cluster s3 bucket name is defined"
   assert:
     that:
       - cluster.s3_bucket_name is defined
       - cluster.s3_bucket_name | length > 0
     msg: "Cluster 's3_bucket_name' is not defined, but required"
 
-- name: ensure workers array is defined
+- name: "({{ cluster.name }}) ensure workers array is defined"
   assert:
     that:
       - cluster.workers is defined
       - cluster.workers | length > 0
     msg: "No worker nodes are defined. Your cluster will be useless"
 
-- name: ensure workers array is defined correctly
+- name: "({{ cluster.name }}) ensure workers array is defined correctly"
   assert:
     that:
       - item.name is defined
@@ -44,7 +44,7 @@
 ###
 ### Validate availability zones
 ###
-- name: ensure master availability zones are within defined availability zones
+- name: "({{ cluster.name }}) ensure master availability zones are within defined availability zones"
   assert:
     that:
       - item in cluster.az | default(kops_default_az)
@@ -59,7 +59,7 @@
       {{ kops_default_master_az }}
       {%- endif -%}
 
-- name: ensure bastion availability zones are within defined availability zones
+- name: "({{ cluster.name }}) ensure bastion availability zones are within defined availability zones"
   assert:
     that:
       - item in cluster.az | default(kops_default_az)
@@ -74,7 +74,7 @@
       {{ kops_default_bastion_az }}
       {%- endif -%}
 
-- name: ensure worker availability zones are within defined availability zones
+- name: "({{ cluster.name }}) ensure worker availability zones are within defined availability zones"
   assert:
     that:
       - >-
