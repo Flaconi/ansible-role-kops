@@ -164,7 +164,9 @@
       --name {{ cluster.name }} )"; then \
       exit 1;
     else
-      echo "${stdout}" | grep -E '^[[:space:]]+[+-][[:space:]]' || true
+      echo "${stdout}" \
+        | grep -Ev '^No changes need to be applied' \
+        || true
     fi
   check_mode: False
   register: _kops_diff_cluster_update
