@@ -29,7 +29,7 @@ kops_default_aws_account_limit: []
 # to True and Kops will deploy the cluster in this existing infrastructure without changing
 # anything of it.
 # TODO: Implement me
-#kops_default_shared_infrastructure: False
+# kops_default_shared_infrastructure: False
 
 
 ###

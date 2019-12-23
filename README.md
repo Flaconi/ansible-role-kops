@@ -165,6 +165,8 @@ kops_cluster:
     ssh_pub_key: ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk
     api_access:
       - 185.28.180.95/32
+    api_additional_sgs:
+      - sg-f0fce83023b2541a6
     ssh_access:
       - 185.28.180.95/32
     az: [a, b, c]
