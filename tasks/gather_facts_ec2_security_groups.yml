@@ -1,0 +1,26 @@
+---
+
+###
+### Gather ec2 security facts
+###
+
+- name: "({{ cluster.name }}) set ec2 security filter"
+  set_fact:
+    kops_ec2_security_groups_filters:
+      - key: group-name
+        val: "{{ to_be_defined }}"
+      - key: vpc-id
+        val: "{{ kops_vpc_id }}"
+
+- name: Get Security Group ID
+  ec2_group_facts:
+    filters: "{{ kops_ec2_security_groups_filters }}"
+  register: _kops_api_additional_sgs
+
+- name: Print variable
+  debugg:
+    msg: EC2 Security Group ID {{ _kops_api_additional_sgs }}
+
+- name: Set Security ID fact
+  set_fact:
+    kops_api_additional_sgs: "{{ _kops_api_additional_sgs }}"
