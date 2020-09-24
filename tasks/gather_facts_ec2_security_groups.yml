@@ -17,7 +17,7 @@
     security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ kops_aws_profile | default(omit) }}"
     filters: "{{ kops_ec2_security_groups_filters | get_attr('key', 'val') }}"
-    region:  "{{ cluster.region | default(kops_default_region) }}"
+    region: "{{ cluster.region | default(kops_default_region) }}"
   register: _kops_api_additional_sgs
 
 - name: Set Security ID fact
@@ -27,4 +27,3 @@
   no_log: true
   with_items: "{{ _kops_api_additional_sgs.security_groups }}"
   when: item | length > 0
-
