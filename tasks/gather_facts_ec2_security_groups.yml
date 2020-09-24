@@ -24,6 +24,7 @@
   set_fact:
     kops_api_additional_sgs: "{{ kops_api_additional_sgs |
       combine( { item.group_name: item.group_id } ) }}"
+  no_log: true
   with_items: "{{ _kops_api_additional_sgs.security_groups }}"
   when: item | length > 0
 
