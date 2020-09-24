@@ -20,7 +20,7 @@
     region: "{{ cluster.region | default(kops_default_region) }}"
   register: _kops_api_additional_sgs
 
-- name: Set Security ID fact
+- name: Set Security Groups ID fact
   set_fact:
     kops_api_additional_sgs: "{{ kops_api_additional_sgs |
       combine( { item.group_name: item.group_id } ) }}"
