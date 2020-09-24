@@ -15,6 +15,7 @@
 - name: Get Security Group ID
   ec2_group_facts:
     filters: "{{ kops_ec2_security_groups_filters | get_attr('key', 'val') }}"
+    region:  "{{ cluster.region | default(kops_default_region) }}"
   register: _kops_api_additional_sgs
 
 - name: Print variable
