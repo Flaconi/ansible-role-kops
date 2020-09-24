@@ -40,7 +40,7 @@ spec:
 {% set root_volume_size = worker.vol_size | default(kops_default_worker_vol_size) %}
 ---
 
-apiVersion: kops/v1alpha2
+apiVersion: kops.k8s.io/v1alpha2
 kind: InstanceGroup
 metadata:
   creationTimestamp: null
@@ -92,7 +92,7 @@ spec:
 {% set subnet = kops_private_subnets[curr_az] %}
 ---
 
-apiVersion: kops/v1alpha2
+apiVersion: kops.k8s.io/v1alpha2
 kind: InstanceGroup
 metadata:
   creationTimestamp: null
