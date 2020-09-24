@@ -7,8 +7,8 @@
 - name: "({{ cluster.name }}) set ec2 security filter"
   set_fact:
     kops_ec2_security_groups_filters:
-      - key: group-name
-        val: "{{ to_be_defined }}"
+      # - key: group-name
+      #   val: "{{ to_be_defined }}"
       - key: vpc-id
         val: "{{ kops_vpc_id }}"
 
@@ -18,7 +18,7 @@
   register: _kops_api_additional_sgs
 
 - name: Print variable
-  debugg:
+  debug:
     msg: EC2 Security Group ID {{ _kops_api_additional_sgs }}
 
 - name: Set Security ID fact
