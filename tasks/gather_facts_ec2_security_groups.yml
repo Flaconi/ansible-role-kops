@@ -29,4 +29,8 @@
   with_items: "{{ _kops_api_additional_sgs.security_groups }}"
   when: item | length > 0
 
+
+- name: Print variable
+  debug:
+    msg: Final List {{ kops_api_additional_sgs }}
     # "{{ _kops_api_additional_sgs }}"
