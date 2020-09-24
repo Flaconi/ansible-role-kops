@@ -24,4 +24,7 @@
 
 - name: Set Security ID fact
   set_fact:
-    kops_api_additional_sgs: "{{ _kops_api_additional_sgs }}"
+    kops_api_additional_sgs: "{{ kops_api_additional_sgs |
+      combine( {_kops_api_additional_sg.name: {'group_id': _kops_api_additional_sgs.group_id} } ) }}"
+
+    # "{{ _kops_api_additional_sgs }}"
