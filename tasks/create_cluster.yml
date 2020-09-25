@@ -12,6 +12,7 @@
 - set_fact:
     kops_utility_subnets: []
     kops_private_subnets: []
+    kops_api_additional_sgs: []
 
 
 ###
@@ -39,6 +40,9 @@
   with_items:
     - "{{ cluster.az | default(kops_default_az) }}"
 
+# Returns:
+# * kops_api_additional_sgs
+- include_tasks: gather_facts_ec2_security_groups.yml
 
 ###
 ### Generate templates

@@ -9,8 +9,8 @@ spec:
       type: Public
 {% if cluster.api_additional_sgs is defined and cluster.api_additional_sgs|length > 0 %}
       additionalSecurityGroups:
-{% for ip in cluster.api_additional_sgs %}
-        - {{ ip }}
+{% for name in cluster.api_additional_sgs %}
+        - {{ kops_api_additional_sgs[name] }}
 {% endfor %}
 {% endif %}
 {% set aws_iam_authenticator_enabled = cluster.aws_iam_authenticator_enabled if 'aws_iam_authenticator_enabled' in cluster else kops_default_aws_iam_authenticator_enabled %}

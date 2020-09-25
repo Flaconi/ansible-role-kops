@@ -166,7 +166,7 @@ kops_cluster:
     api_access:
       - 185.28.180.95/32
     api_additional_sgs:
-      - sg-f0fce83023b2541a6
+      - "security_group_name"
     ssh_access:
       - 185.28.180.95/32
     az: [a, b, c]
