@@ -33,6 +33,15 @@ kops_default_aws_account_limit: []
 
 
 ###
+### Egress management
+###
+
+# By default module will grab NAT GWs defined in filters and use it for egress
+# If you manage egress routing separately, e.g. in case of VGW or TGW please set to True
+kops_externally_managed_egress: False
+
+
+###
 ### High Availability
 ###
 

@@ -70,6 +70,7 @@
       - _kops_nat_gw_facts.result is defined
       - _kops_nat_gw_facts.result | length == 1
     msg: Not exactly one NAT gateway has been found
+  when: not kops_externally_managed_egress
 
 
 ###
@@ -85,7 +86,7 @@
             'id':   _kops_subnet_utility_facts.subnets[0].id,
             'az':   _kops_subnet_utility_facts.subnets[0].availability_zone,
             'cidr': _kops_subnet_utility_facts.subnets[0].cidr_block,
-            'nat_id': _kops_nat_gw_facts.result[0].nat_gateway_id
+            'nat_id': '' if kops_externally_managed_egress else _kops_nat_gw_facts.result[0].nat_gateway_id
           }
         }
       }}

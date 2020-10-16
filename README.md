@@ -82,6 +82,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 | `kops_default_image`                         | `kope.io/k8s-1.9-debian-jessie-amd64-hvm-ebs-2018-03-11` | Default AMI to use. [See here for other AMIs'](https://github.com/kubernetes/kops/blob/master/channels/stable) |
 | `kops_default_api_access`                    | `[0.0.0.0/32]` | Array of allowed IP's to access the API from |
 | `kops_default_ssh_access`                    | `[0.0.0.0/32]` | Array of allowed IP's to ssh into the machines from |
+| `kops_externally_managed_egress`             | `false`        | If you manage default routing separately, e.g. in case of VGW or TGW please set to True |
 | `kops_default_az`                            | `[a, b, c]`    | Available availability zones to be used by master, worker and bastion hosts |
 | `kops_default_master_az`                     | `[a, b, c]`    | Availability zones to launch master nodes in |
 | `kops_default_worker_az`                     | `[a, b, c]`    | Availability zones to launch worker nodes in |
