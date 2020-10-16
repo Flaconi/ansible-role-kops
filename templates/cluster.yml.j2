@@ -95,7 +95,7 @@ spec:
 {% for subnet in (kops_private_subnets.keys() | sort) %}
     - cidr: {{ kops_private_subnets[subnet].cidr }}
       id: {{ kops_private_subnets[subnet].id }}
-      {# The NAT GW ID is taken from the public subnets equivilants -#}
+      {# The NAT GW ID is taken from the public subnets equivalents -#}
       egress: {{ kops_utility_subnets[subnet].nat_id }}
       name: {{ kops_private_subnets[subnet].az }}
       type: Private
