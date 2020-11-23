@@ -30,6 +30,10 @@ spec:
   kubeAPIServer:
 {{ cluster.kube_api_server | to_nice_yaml(indent=2) | indent(width=4, indentfirst=True) }}
 {% endif %}
+{% if 'file_assets' in cluster and cluster.file_assets %}
+  fileAssets:
+{{ cluster.file_assets | to_nice_yaml(indent=2) | indent(width=4, indentfirst=True) }}
+{% endif %}
 {% if 'additionalPolicies' in cluster and cluster.additionalPolicies and
   ( 'node' in cluster.additionalPolicies and cluster.additionalPolicies.node or
   'master' in cluster.additionalPolicies and cluster.additionalPolicies.master ) %}
