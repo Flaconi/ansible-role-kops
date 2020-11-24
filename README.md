@@ -141,6 +141,17 @@ kops_cluster:
       oidcUsernamePrefix: "oidc:"
       oidcGroupsClaim: groups
       oidcGroupsPrefix: "oidc:"
+    # https://github.com/kubernetes/kops/blob/master/docs/cluster_spec.md#fileassets
+    file_assets:
+      - name: audit-policy-config
+        path: /srv/kubernetes/audit/policy-config.yaml
+        roles:
+          - Master
+        content: |
+          apiVersion: audit.k8s.io/v1
+          kind: Policy
+          rules:
+            - level: Metadata
     additionalPolicies:
         node: |
           [
