@@ -13,6 +13,7 @@
     kops_utility_subnets: []
     kops_private_subnets: []
     kops_api_additional_sgs: []
+    kops_ssh_additional_cidrs: []
 
 
 ###
@@ -42,6 +43,7 @@
 
 # Returns:
 # * kops_api_additional_sgs
+# * kops_ssh_additional_cidrs
 - include_tasks: gather_facts_ec2_security_groups.yml
 
 ###
