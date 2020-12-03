@@ -95,6 +95,9 @@ spec:
 {% for ip in cluster.ssh_access | default(kops_default_ssh_access) %}
     - {{ ip }}
 {% endfor %}
+{% for ip in kops_ssh_additional_cidrs %}
+    - {{ ip }}
+{% endfor %}
   subnets:
 {% for subnet in (kops_private_subnets.keys() | sort) %}
     - cidr: {{ kops_private_subnets[subnet].cidr }}
