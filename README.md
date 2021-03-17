@@ -12,6 +12,11 @@ must be explicitly stated.
 [![Version](https://img.shields.io/github/tag/Flaconi/ansible-role-kops.svg)](https://github.com/Flaconi/ansible-role-kops/tags)
 [![Ansible Galaxy](https://img.shields.io/ansible/role/d/25923.svg)](https://galaxy.ansible.com/Flaconi/kops/)
 
+## Role tagging
+
+This Ansible role is tagged according to the latest compatible (and tested by us) version of [kops](https://github.com/kubernetes/kops/blob/master/docs/install.md) used.
+
+
 ## Requirements
 
 * Ansible 2.5
