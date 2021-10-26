@@ -28,11 +28,11 @@ spec:
     insecureRegistry: 100.64.0.0/10
 {% if 'kube_api_server' in cluster and cluster.kube_api_server %}
   kubeAPIServer:
-{{ cluster.kube_api_server | to_nice_yaml(indent=2) | indent(width=4, indentfirst=True) }}
+{{ cluster.kube_api_server | to_nice_yaml(indent=2) | indent(width=4, first=True) }}
 {% endif %}
 {% if 'file_assets' in cluster and cluster.file_assets %}
   fileAssets:
-{{ cluster.file_assets | to_nice_yaml(indent=2) | indent(width=4, indentfirst=True) }}
+{{ cluster.file_assets | to_nice_yaml(indent=2) | indent(width=4, first=True) }}
 {% endif %}
 {% if 'additionalPolicies' in cluster and cluster.additionalPolicies and
   ( 'node' in cluster.additionalPolicies and cluster.additionalPolicies.node or
@@ -40,11 +40,11 @@ spec:
   additionalPolicies:
 {% if 'node' in cluster.additionalPolicies and cluster.additionalPolicies.node %}
     node: |
-{{ cluster.additionalPolicies.node | from_json | to_nice_json(indent=2) | indent(width=6, indentfirst=True) }}
+{{ cluster.additionalPolicies.node | from_json | to_nice_json(indent=2) | indent(width=6, first=True) }}
 {% endif %}
 {% if 'master' in cluster.additionalPolicies and cluster.additionalPolicies.master %}
     master: |
-{{ cluster.additionalPolicies.master | from_json | to_nice_json(indent=2) | indent(width=6, indentfirst=True) }}
+{{ cluster.additionalPolicies.master | from_json | to_nice_json(indent=2) | indent(width=6, first=True) }}
 {% endif %}
 {% endif %}
   etcdClusters:
