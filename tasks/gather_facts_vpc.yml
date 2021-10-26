@@ -12,9 +12,9 @@
 
 - name: "({{ cluster.name }}) gather vpc facts"
   ec2_vpc_net_facts:
-    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
-    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit)  }}"
-    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('env', 'AWS_SECRET_KEY') | default(omit)  }}"
+    security_token: "{{ lookup('env', 'AWS_SECURITY_TOKEN') | default(omit) }}"
     profile: "{{ kops_aws_profile | default(omit) }}"
     region: "{{ cluster.region | default(kops_default_region) }}"
     filters: "{{ kops_vpc_filters | get_attr('key', 'val') }}"
