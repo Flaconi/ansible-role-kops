@@ -107,6 +107,7 @@ spec:
   minSize: 1
   nodeLabels:
     kops.k8s.io/instancegroup: master-{{ subnet.az }}
+    dedicated: master
   role: Master
   subnets:
     - {{ subnet.az }}
