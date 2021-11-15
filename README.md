@@ -224,6 +224,10 @@ kops_cluster:
             val: some-fancy-name
           - key: purpose
             value: something-important
+    encryptionConfig:
+      enabled: true
+      image: "<PROVIDER>/aws-encryption-provider"
+      kms_id: "12345678-9abc-defg-hijk-000000000001"
 ```
 
 
