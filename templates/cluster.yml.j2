@@ -126,3 +126,50 @@ spec:
       type: Public
     masters: private
     nodes: private
+{% if cluster.encryptionConfig is defined and 'enabled' in cluster.encryptionConfig and
+  cluster.encryptionConfig.enabled %}
+  encryptionConfig: true
+  fileAssets:
+  - name: aws-encryption-provider.yaml
+    ## Note if not path is specified the default path it /srv/kubernetes/assets/<name>
+    path: /etc/kubernetes/manifests/aws-encryption-provider.yaml
+    roles:
+    - Master
+    content: |
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        annotations:
+          scheduler.alpha.kubernetes.io/critical-pod: ""
+        labels:
+          k8s-app: aws-encryption-provider
+        name: aws-encryption-provider
+        namespace: kube-system
+      spec:
+        containers:
+        - image: {{ cluster.encryptionConfig.image }}
+          name: aws-encryption-provider
+          command:
+          - /aws-encryption-provider
+          - --key=arn:aws:kms:{{ cluster.region }}:{{ aws_account }}:key/{{ cluster.encryptionConfig.kms_id }}
+          - --region={{ cluster.region }}
+          - --listen=/srv/kubernetes/socket.sock
+          - --health-port=:8083
+          ports:
+          - containerPort: 8083
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8083
+          volumeMounts:
+          - mountPath: /srv/kubernetes
+            name: kmsplugin
+        hostNetwork: true
+        priorityClassName: system-cluster-critical
+        volumes:
+        - name: kmsplugin
+          hostPath:
+            path: /srv/kubernetes
+            type: DirectoryOrCreate
+{% endif %}
