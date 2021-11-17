@@ -36,7 +36,7 @@ spec:
   fileAssets:
 {% if file_assets_enabled %}
 {{ cluster.file_assets | to_nice_yaml(indent=2) | indent(width=4, first=True) }}
-{% endif %}
+{%- endif %}
 {% if encryption_enabled %}
     - name: aws-encryption-provider.yaml
       ## Note if not path is specified the default path it /srv/kubernetes/assets/<name>
