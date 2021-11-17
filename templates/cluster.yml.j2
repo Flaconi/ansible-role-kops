@@ -30,10 +30,60 @@ spec:
   kubeAPIServer:
 {{ cluster.kube_api_server | to_nice_yaml(indent=2) | indent(width=4, first=True) }}
 {% endif %}
-{% if 'file_assets' in cluster and cluster.file_assets %}
+{% set file_assets_enabled = true if 'file_assets' in cluster and cluster.file_assets %}
+{% set encryption_enabled = true if cluster.encryptionConfig is defined and 'enabled' in cluster.encryptionConfig and cluster.encryptionConfig.enabled %}
+{% if file_assets_enabled or encryption_enabled %}
   fileAssets:
+{% if file_assets_enabled %}
 {{ cluster.file_assets | to_nice_yaml(indent=2) | indent(width=4, first=True) }}
 {% endif %}
+{% if encryption_enabled %}
+    - name: aws-encryption-provider.yaml
+      ## Note if not path is specified the default path it /srv/kubernetes/assets/<name>
+      path: /etc/kubernetes/manifests/aws-encryption-provider.yaml
+      roles:
+      - Master
+      content: |
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          annotations:
+            scheduler.alpha.kubernetes.io/critical-pod: ""
+          labels:
+            k8s-app: aws-encryption-provider
+          name: aws-encryption-provider
+          namespace: kube-system
+        spec:
+          containers:
+          - image: {{ cluster.encryptionConfig.image }}
+            name: aws-encryption-provider
+            command:
+            - /aws-encryption-provider
+            - --key=arn:aws:kms:{{ cluster.region }}:{{ aws_account }}:key/{{ cluster.encryptionConfig.kms_id }}
+            - --region={{ cluster.region }}
+            - --listen=/srv/kubernetes/socket.sock
+            - --health-port=:8083
+            ports:
+            - containerPort: 8083
+              protocol: TCP
+            livenessProbe:
+              httpGet:
+                path: /healthz
+                port: 8083
+            volumeMounts:
+            - mountPath: /srv/kubernetes
+              name: kmsplugin
+          hostNetwork: true
+          priorityClassName: system-cluster-critical
+          volumes:
+          - name: kmsplugin
+            hostPath:
+              path: /srv/kubernetes
+              type: DirectoryOrCreate
+{% endif %}
+{# End of encryption_enabled #}
+{% endif %}
+{# End of file_assets_enabled or encryption_enabled #}
 {% if 'additionalPolicies' in cluster and cluster.additionalPolicies and
   ( 'node' in cluster.additionalPolicies and cluster.additionalPolicies.node or
   'master' in cluster.additionalPolicies and cluster.additionalPolicies.master ) %}
@@ -129,47 +179,4 @@ spec:
 {% if cluster.encryptionConfig is defined and 'enabled' in cluster.encryptionConfig and
   cluster.encryptionConfig.enabled %}
   encryptionConfig: true
-  fileAssets:
-  - name: aws-encryption-provider.yaml
-    ## Note if not path is specified the default path it /srv/kubernetes/assets/<name>
-    path: /etc/kubernetes/manifests/aws-encryption-provider.yaml
-    roles:
-    - Master
-    content: |
-      apiVersion: v1
-      kind: Pod
-      metadata:
-        annotations:
-          scheduler.alpha.kubernetes.io/critical-pod: ""
-        labels:
-          k8s-app: aws-encryption-provider
-        name: aws-encryption-provider
-        namespace: kube-system
-      spec:
-        containers:
-        - image: {{ cluster.encryptionConfig.image }}
-          name: aws-encryption-provider
-          command:
-          - /aws-encryption-provider
-          - --key=arn:aws:kms:{{ cluster.region }}:{{ aws_account }}:key/{{ cluster.encryptionConfig.kms_id }}
-          - --region={{ cluster.region }}
-          - --listen=/srv/kubernetes/socket.sock
-          - --health-port=:8083
-          ports:
-          - containerPort: 8083
-            protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8083
-          volumeMounts:
-          - mountPath: /srv/kubernetes
-            name: kmsplugin
-        hostNetwork: true
-        priorityClassName: system-cluster-critical
-        volumes:
-        - name: kmsplugin
-          hostPath:
-            path: /srv/kubernetes
-            type: DirectoryOrCreate
 {% endif %}
