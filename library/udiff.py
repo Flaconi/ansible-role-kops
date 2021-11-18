@@ -302,7 +302,10 @@ def normalize_yaml(string, ignore):
 
 
     # Sort the list by keys: metadata.name
-    s_sections = sorted(sections, key=lambda k: k['metadata']['name'])
+    if 'metadata' in ignore:
+      s_sections = sections
+    else:
+      s_sections = sorted(sections, key=lambda k: k['metadata']['name'])
 
     output = ''
     for section in s_sections:
