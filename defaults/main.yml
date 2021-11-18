@@ -90,3 +90,8 @@ kops_default_aws_iam_authenticator_enabled: false
 ### Cluster array definition (See README.md)
 ###
 kops_cluster: []
+
+kops_default_encryptionConfig:
+  enabled: false
+  image: "flaconi/aws-encryption-provider:v0.1.0"
+  kms_id: "12345678-1234-1234-1234-1234567890ab"

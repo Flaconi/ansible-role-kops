@@ -86,3 +86,50 @@
       is not within '[{{ cluster.az | default(kops_default_az) | join(',') }}]'
   with_items:
     - "{{ cluster.workers }}"
+
+###
+### Validate encryptionConfig setting
+###
+- name: "({{ cluster.name }}) ensure encryptionConfig enabled is boolean"
+  assert:
+    that:
+      - item.enabled is defined
+      - item.enabled | type_debug == 'bool'
+    msg: "enabled should be true or false"
+  with_items:
+    - >-
+      {%- if cluster.encryptionConfig is defined and 'enabled' in cluster.encryptionConfig -%}
+      {{ cluster.encryptionConfig }}
+      {%- else -%}
+      {{ kops_default_encryptionConfig }}
+      {%- endif -%}
+
+- name: "({{ cluster.name }}) ensure encryptionConfig image is defined"
+  assert:
+    that:
+      - item.image is defined
+      - item.image | length > 0
+    msg: "No 'image' is defined"
+  with_items:
+    - >-
+      {%- if cluster.encryptionConfig is defined and 'enabled' in cluster.encryptionConfig and
+      cluster.encryptionConfig.enabled -%}
+      {{ cluster.encryptionConfig }}
+      {%- else -%}
+      {{ kops_default_encryptionConfig }}
+      {%- endif -%}
+
+- name: "({{ cluster.name }}) ensure encryptionConfig kms_id is defined"
+  assert:
+    that:
+      - item.kms_id is defined
+      - item.kms_id | length == 36
+    msg: "Check 'kms_id' is defined and length is 36"
+  with_items:
+    - >-
+      {%- if cluster.encryptionConfig is defined and 'enabled' in cluster.encryptionConfig and
+      cluster.encryptionConfig.enabled -%}
+      {{ cluster.encryptionConfig }}
+      {%- else -%}
+      {{ kops_default_encryptionConfig }}
+      {%- endif -%}
