@@ -1,0 +1,11 @@
+---
+- name: Running the asserts test case
+  hosts: localhost
+  tasks:
+    - include_role:
+        name: rolename
+        tasks_from: asserts
+      loop_control:
+        loop_var: cluster
+      with_items:
+        - "{{ kops_cluster }}"
