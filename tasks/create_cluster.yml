@@ -4,6 +4,8 @@
 ### Assert defaults and cluster overwrites
 ###
 - include_tasks: asserts.yml
+  tags:
+    - ci_test
 
 
 ###

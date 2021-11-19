@@ -9,6 +9,8 @@
       - cluster.name is defined
       - cluster.name | length > 0
     msg: "Cluster 'name' is not defined, but required"
+  tags:
+    - ci_test
 
 - name: "({{ cluster.name }}) ensure cluster ssh key is defined"
   assert:
@@ -17,6 +19,8 @@
         (cluster.ssh_pub_key is defined and cluster.ssh_pub_key | length > 0) or
         (kops_default_ssh_pub_key is defined and kops_default_ssh_pub_key | length > 0)
     msg: "Cluster 'ssh_pub_key' or kops_default_ssh_pub_key is not defined, but one of them is required"
+  tags:
+    - ci_test
 
 - name: "({{ cluster.name }}) ensure cluster s3 bucket name is defined"
   assert:
@@ -24,6 +28,8 @@
       - cluster.s3_bucket_name is defined
       - cluster.s3_bucket_name | length > 0
     msg: "Cluster 's3_bucket_name' is not defined, but required"
+  tags:
+    - ci_test
 
 - name: "({{ cluster.name }}) ensure workers array is defined"
   assert:
@@ -31,6 +37,8 @@
       - cluster.workers is defined
       - cluster.workers | length > 0
     msg: "No worker nodes are defined. Your cluster will be useless"
+  tags:
+    - ci_test
 
 - name: "({{ cluster.name }}) ensure workers array is defined correctly"
   assert:
@@ -40,6 +48,8 @@
     msg: "No worker 'name' is defined"
   with_items:
     - "{{ cluster.workers }}"
+  tags:
+    - ci_test
 
 ###
 ### Validate availability zones
@@ -58,6 +68,8 @@
       {%- else -%}
       {{ kops_default_master_az }}
       {%- endif -%}
+  tags:
+    - ci_test
 
 - name: "({{ cluster.name }}) ensure bastion availability zones are within defined availability zones"
   assert:
@@ -73,6 +85,8 @@
       {%- else -%}
       {{ kops_default_bastion_az }}
       {%- endif -%}
+  tags:
+    - ci_test
 
 - name: "({{ cluster.name }}) ensure worker availability zones are within defined availability zones"
   assert:
@@ -86,6 +100,8 @@
       is not within '[{{ cluster.az | default(kops_default_az) | join(',') }}]'
   with_items:
     - "{{ cluster.workers }}"
+  tags:
+    - ci_test
 
 ###
 ### Validate encryptionConfig setting
@@ -103,6 +119,8 @@
       {%- else -%}
       {{ kops_default_encryptionConfig }}
       {%- endif -%}
+  tags:
+    - ci_test
 
 - name: "({{ cluster.name }}) ensure encryptionConfig image is defined"
   assert:
@@ -118,6 +136,8 @@
       {%- else -%}
       {{ kops_default_encryptionConfig }}
       {%- endif -%}
+  tags:
+    - ci_test
 
 - name: "({{ cluster.name }}) ensure encryptionConfig kms_id is defined"
   assert:
@@ -133,3 +153,5 @@
       {%- else -%}
       {{ kops_default_encryptionConfig }}
       {%- endif -%}
+  tags:
+    - ci_test

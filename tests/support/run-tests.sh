@@ -14,3 +14,7 @@ ansible-playbook test_defaults.yml > /tmp/second_run.log
     echo 'Playbook is **NOT** idempotent'
     exit 1
 }
+
+set -e
+ansible-playbook test_defaults.yml --extra-vars "@test_sample_value.yml" \
+--tags ci_test
