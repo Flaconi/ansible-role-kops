@@ -14,7 +14,7 @@ help:
 	@printf "%s\n"   "make help             Show help"
 
 test:
-	docker run --rm -it \
+	docker run --rm \
 		-v ${PWD}:/etc/ansible/roles/rolename \
 		--workdir /etc/ansible/roles/rolename/tests \
 		flaconi/ansible:${ANSIBLE_VERSION} ./support/run-tests.sh
