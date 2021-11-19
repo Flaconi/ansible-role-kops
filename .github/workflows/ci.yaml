@@ -1,0 +1,22 @@
+---
+name: CI build
+on: [push]
+
+jobs:
+  ci_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Lint Files
+        run: |
+          make lint
+
+      - name: Test Asserts with sample value ansible=2.5
+        run: |
+          make test
+
+      - name: Test Asserts with sample value ansible=latest
+        run: |
+          make test ANSIBLE_VERSION=latest
