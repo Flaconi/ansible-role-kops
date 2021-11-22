@@ -13,7 +13,7 @@ jobs:
         run: |
           make lint
 
-      - name: Test Asserts with sample value ansible=2.5
+      - name: Test Asserts with sample value ansible=2.8
         run: |
           make test
 
