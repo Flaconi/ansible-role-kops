@@ -1,0 +1,93 @@
+---
+kops_cluster:
+  - name: playground-cluster-shop.k8s.local
+    master_public_name: api-playground-cluster-shop.example.net
+    aws_iam_authenticator_enabled: true
+    kube_api_server:
+      oidcIssuerURL: https://oidc.example.net
+      oidcClientID: clientID
+      oidcUsernameClaim: email
+      oidcUsernamePrefix: "oidc:"
+      oidcGroupsClaim: groups
+      oidcGroupsPrefix: "oidc:"
+    # https://github.com/kubernetes/kops/blob/master/docs/cluster_spec.md#fileassets
+    file_assets:
+      - name: audit-policy-config
+        path: /srv/kubernetes/audit/policy-config.yaml
+        roles:
+          - Master
+        content: |
+          apiVersion: audit.k8s.io/v1
+          kind: Policy
+          rules:
+            - level: Metadata
+    additionalPolicies:
+      node: |
+        [
+          {
+            "Effect": "Allow",
+            "Action": ["route53:*"],
+            "Resource": ["*"]
+          }
+        ]
+      master: |
+        [
+          {
+            "Effect": "Allow",
+            "Action": ["route53:*"],
+            "Resource": ["*"]
+          }
+        ]
+    version: v1.10.4
+    type: private
+    region: eu-central-1
+    image: kope.io/k8s-1.8-debian-jessie-amd64-hvm-ebs-2018-02-08
+    s3_bucket_name: playground-cluster-shop-state-store
+    ssh_pub_key: ssh-ed25519 AAAANSLxbLKF6DL8GDFE70AAAAIP8kH/aB4LKI2+S6a921rCwl2OZdL09iBhGHJ23jk
+    api_access:
+      - 185.28.180.95/32
+    api_additional_sgs:
+      - "security_group_name"
+    ssh_access:
+      - 185.28.180.95/32
+    az: [a, b, c]
+    bastion:
+      az: [a]
+      instance_type: t2.micro
+    masters:
+      count: 3
+      instance_type: t2.medium
+      az: [a, b, c]
+    workers:
+      - name: c4xlargea
+        instance_type: c4.xlarge
+        min_size: 1
+        max_size: 3
+        volume_size: 200
+        availability_zones: [a]
+      - name: c4xlargeb
+        instance_type: c4.xlarge
+        min_size: 1
+        max_size: 3
+        volume_size: 200
+        availability_zones: [b]
+      - name: c4xlargec
+        instance_type: c4.xlarge
+        min_size: 1
+        max_size: 3
+        volume_size: 200
+        availability_zones: [c]
+        cloud_labels:
+          - key: team
+            val: me
+          - key: project
+            value: ion
+        node_labels:
+          - key: name
+            val: some-fancy-name
+          - key: purpose
+            value: something-important
+    encryptionConfig:
+      enabled: true
+      image: "<PROVIDER>/aws-encryption-provider"
+      kms_id: "12345678-9abc-defg-hijk-000000000001"

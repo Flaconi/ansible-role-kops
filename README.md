@@ -8,7 +8,7 @@ Full dry-run is supported.
 **Note:** By default only configuration files are created, actual state store or cluster actions
 must be explicitly stated.
 
-[![Build Status](https://travis-ci.org/Flaconi/ansible-role-kops.svg?branch=master)](https://travis-ci.org/Flaconi/ansible-role-kops)
+[![CI build](https://github.com/Flaconi/ansible-role-kops/actions/workflows/ci.yaml/badge.svg)](https://github.com/Flaconi/ansible-role-kops/actions/workflows/ci.yaml)
 [![Version](https://img.shields.io/github/tag/Flaconi/ansible-role-kops.svg)](https://github.com/Flaconi/ansible-role-kops/tags)
 [![Ansible Galaxy](https://img.shields.io/ansible/role/d/25923.svg)](https://galaxy.ansible.com/Flaconi/kops/)
 
@@ -19,7 +19,7 @@ This Ansible role is tagged according to the latest compatible (and tested by us
 
 ## Requirements
 
-* Ansible 2.5
+* Ansible 2.8
 * Python lib: [pyaml](https://github.com/yaml/pyyaml)
 * Binary: [kops](https://github.com/kubernetes/kops/blob/master/docs/install.md)
 

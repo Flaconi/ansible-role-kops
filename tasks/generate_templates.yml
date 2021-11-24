@@ -13,6 +13,7 @@
   loop:
     - cluster.yml
     - instance-groups.yml
+    - encryption-config.yml
     - ssh-key.pub
 
 - name: "({{ cluster.name }}) generate shell scripts"

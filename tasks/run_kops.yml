@@ -51,6 +51,30 @@
     - kops_update is defined
     - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
+- name: "({{ cluster.name }}) diff generated EncryptionConfiguration against remote state store"
+  udiff:
+    source: "{{ lookup('template', 'encryption-config.yml.j2') }}"
+    target: |
+      # If using boto_profile, make kops aware of it
+      if [ -n "${BOTO_PROFILE}" ]; then
+        export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
+      fi
+      # Don't fail to show that remote has nothing yet
+      kops get secret encryptionconfig -o plaintext \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} || true
+    source_type: string
+    target_type: command
+    diff: yaml
+    diff_yaml_ignore: ['metadata']
+  check_mode: False
+  register: _kops_diff_state_encryptionconfig
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
 - name: "({{ cluster.name }}) diff ssh public key against remote state store"
   udiff:
     source: |
@@ -120,6 +144,25 @@
     BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
   when:
     - _kops_diff_state_instancegroups['changed']
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+- name: "({{ cluster.name }}) update state store for EncryptionConfiguration"
+  shell: |
+    # If using boto_profile, make kops aware of it
+    if [ -n "${BOTO_PROFILE}" ]; then
+      export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
+    fi
+    kops create secret encryptionconfig -v 9 --force \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      -f {{ kops_default_build_directory }}/{{ cluster.name }}/encryption-config.yml
+  args:
+    executable: bash
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - _kops_diff_state_encryptionconfig['changed']
     - kops_update is defined
     - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 

@@ -1,0 +1,14 @@
+{% if cluster.encryptionConfig is defined and 'enabled' in cluster.encryptionConfig and cluster.encryptionConfig.enabled %}
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources:
+      - secrets
+    providers:
+      - kms:
+          name: aws-encryption-provider
+          endpoint: unix:///srv/kubernetes/socket.sock
+          cachesize: 1000
+          timeout: 3s
+      - identity: {}
+{% endif %}

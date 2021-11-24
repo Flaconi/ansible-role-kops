@@ -1,7 +1,7 @@
 ###
 ### Variables
 ###
-ANSIBLE_VERSION=2.5
+ANSIBLE_VERSION=2.8
 
 
 ###
@@ -14,7 +14,7 @@ help:
 	@printf "%s\n"   "make help             Show help"
 
 test:
-	docker run --rm -it \
+	docker run --rm --pull=always \
 		-v ${PWD}:/etc/ansible/roles/rolename \
 		--workdir /etc/ansible/roles/rolename/tests \
 		flaconi/ansible:${ANSIBLE_VERSION} ./support/run-tests.sh
