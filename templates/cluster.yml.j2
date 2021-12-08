@@ -4,6 +4,10 @@ metadata:
   creationTimestamp: null
   name: {{ cluster.name }}
 spec:
+  kubelet:
+    anonymousAuth: false
+    authenticationTokenWebhook: true
+    authorizationMode: Webhook
   api:
     loadBalancer:
       type: Public
