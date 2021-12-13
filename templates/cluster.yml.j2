@@ -4,6 +4,14 @@ metadata:
   creationTimestamp: null
   name: {{ cluster.name }}
 spec:
+  kubelet:
+    anonymousAuth: {{ cluster.kops_kubelet.anonymousAuth | default(kops_default_kubelet.anonymousAuth) }}
+    authenticationTokenWebhook: {{ cluster.kops_kubelet.authenticationTokenWebhook | default(kops_default_kubelet.authenticationTokenWebhook) }}
+    authorizationMode: {{ cluster.kops_kubelet.authorizationMode | default(kops_default_kubelet.authorizationMode) }}
+  kubeControllerManager:
+    enableProfiling: {{ cluster.kops_kubeControllerManager.enableProfiling | default(kops_default_kubeControllerManager.enableProfiling) }}
+  kubeScheduler:
+    enableProfiling: {{ cluster.kops_kubeScheduler.enableProfiling | default(kops_default_kubeScheduler.enableProfiling) }}
   api:
     loadBalancer:
       type: Public

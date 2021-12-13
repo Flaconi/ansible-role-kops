@@ -133,3 +133,76 @@
       {%- else -%}
       {{ kops_default_encryptionConfig }}
       {%- endif -%}
+
+###
+### Validate security setting
+###
+- name: "({{ cluster.name }}) ensure kubelet.anonymousAuth is boolean"
+  assert:
+    that:
+      - item.anonymousAuth is defined
+      - item.anonymousAuth | type_debug == 'bool'
+    msg: "kubelet.anonymousAuth should be true or false"
+  with_items:
+    - >-
+      {%- if cluster.kops_kubelet is defined and 'anonymousAuth' in cluster.kops_kubelet -%}
+      {{ cluster.kops_kubelet }}
+      {%- else -%}
+      {{ kops_default_kubelet }}
+      {%- endif -%}
+
+- name: "({{ cluster.name }}) ensure kubelet.authenticationTokenWebhook is boolean"
+  assert:
+    that:
+      - item.authenticationTokenWebhook is defined
+      - item.authenticationTokenWebhook | type_debug == 'bool'
+    msg: "kubelet.authenticationTokenWebhook should be true or false"
+  with_items:
+    - >-
+      {%- if cluster.kops_kubelet is defined and 'authenticationTokenWebhook' in cluster.kops_kubelet -%}
+      {{ cluster.kops_kubelet }}
+      {%- else -%}
+      {{ kops_default_kubelet }}
+      {%- endif -%}
+
+- name: "({{ cluster.name }}) ensure kubelet.authorizationMode is string"
+  assert:
+    that:
+      - item.authorizationMode is defined
+      - item.authorizationMode | length > 0
+    msg: "kubelet.authorizationMode should be string"
+  with_items:
+    - >-
+      {%- if cluster.kops_kubelet is defined and 'authorizationMode' in cluster.kops_kubelet -%}
+      {{ cluster.kops_kubelet }}
+      {%- else -%}
+      {{ kops_default_kubelet }}
+      {%- endif -%}
+
+- name: "({{ cluster.name }}) ensure kubeControllerManager.enableProfiling is boolean"
+  assert:
+    that:
+      - item.enableProfiling is defined
+      - item.enableProfiling | type_debug == 'bool'
+    msg: "kubeControllerManager.enableProfiling should be true or false"
+  with_items:
+    - >-
+      {%- if cluster.kubeControllerManager is defined and 'enableProfiling' in cluster.kubeControllerManager -%}
+      {{ cluster.kubeControllerManager }}
+      {%- else -%}
+      {{ kops_default_kubeControllerManager }}
+      {%- endif -%}
+
+- name: "({{ cluster.name }}) ensure kubeScheduler.enableProfiling is boolean"
+  assert:
+    that:
+      - item.enableProfiling is defined
+      - item.enableProfiling | type_debug == 'bool'
+    msg: "kubeScheduler.enableProfiling should be true or false"
+  with_items:
+    - >-
+      {%- if cluster.kubeScheduler is defined and 'enableProfiling' in cluster.kubeScheduler -%}
+      {{ cluster.kubeScheduler }}
+      {%- else -%}
+      {{ kops_default_kubeScheduler }}
+      {%- endif -%}

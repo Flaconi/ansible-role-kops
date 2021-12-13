@@ -95,3 +95,15 @@ kops_default_encryptionConfig:
   enabled: false
   image: "flaconi/aws-encryption-provider:v0.1.0"
   kms_id: "12345678-1234-1234-1234-1234567890ab"
+
+###
+### Security setting recommend by kube-bench cis-1.6
+###
+kops_default_kubelet:
+  anonymousAuth: false
+  authenticationTokenWebhook: true
+  authorizationMode: Webhook
+kops_default_kubeControllerManager:
+  enableProfiling: false
+kops_default_kubeScheduler:
+  enableProfiling: false
