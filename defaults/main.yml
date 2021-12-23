@@ -105,5 +105,6 @@ kops_default_kubelet:
   authorizationMode: Webhook
 kops_default_kubeControllerManager:
   enableProfiling: false
+  terminatedPodGCThreshold: 12500
 kops_default_kubeScheduler:
   enableProfiling: false

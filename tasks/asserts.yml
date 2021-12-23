@@ -193,6 +193,21 @@
       {{ kops_default_kubeControllerManager }}
       {%- endif -%}
 
+- name: "({{ cluster.name }}) ensure kube_controller_manager.terminatedPodGCThreshold is larger or equal to 0"
+  assert:
+    that:
+      - item.terminatedPodGCThreshold is defined
+      - item.terminatedPodGCThreshold >= 0
+    msg: "kube_controller_manager.terminatedPodGCThreshold should >= 0"
+  with_items:
+    - >-
+      {%- if cluster.kube_controller_manager is defined and
+            'terminatedPodGCThreshold' in cluster.kube_controller_manager -%}
+      {{ cluster.kube_controller_manager }}
+      {%- else -%}
+      {{ kops_default_kubeControllerManager }}
+      {%- endif -%}
+
 - name: "({{ cluster.name }}) ensure kubeScheduler.enableProfiling is boolean"
   assert:
     that:
