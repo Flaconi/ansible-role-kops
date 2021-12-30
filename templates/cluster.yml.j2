@@ -8,10 +8,18 @@ spec:
     anonymousAuth: {{ cluster.kops_kubelet.anonymousAuth | default(kops_default_kubelet.anonymousAuth) }}
     authenticationTokenWebhook: {{ cluster.kops_kubelet.authenticationTokenWebhook | default(kops_default_kubelet.authenticationTokenWebhook) }}
     authorizationMode: {{ cluster.kops_kubelet.authorizationMode | default(kops_default_kubelet.authorizationMode) }}
+{% if 'kops_kubelet' in cluster and 'tlsCipherSuites' in cluster.kops_kubelet %}
+    tlsCipherSuites:
+{{ cluster.kops_kubelet.tlsCipherSuites | to_nice_yaml(indent=2) | indent(width=6, first=True) -}}
+{% endif %}
   kubeControllerManager:
     enableProfiling: {{ cluster.kops_kubeControllerManager.enableProfiling | default(kops_default_kubeControllerManager.enableProfiling) }}
 {% if cluster.kube_controller_manager.terminatedPodGCThreshold is defined %}
     terminatedPodGCThreshold: {{ cluster.kube_controller_manager.terminatedPodGCThreshold }}
+{% endif %}
+{% if 'kube_controller_manager' in cluster and 'tlsCipherSuites' in cluster.kube_controller_manager %}
+    tlsCipherSuites:
+{{ cluster.kube_controller_manager.tlsCipherSuites | to_nice_yaml(indent=2) | indent(width=6, first=True) -}}
 {% endif %}
   kubeScheduler:
     enableProfiling: {{ cluster.kops_kubeScheduler.enableProfiling | default(kops_default_kubeScheduler.enableProfiling) }}
