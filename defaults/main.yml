@@ -103,7 +103,14 @@ kops_default_kubelet:
   anonymousAuth: false
   authenticationTokenWebhook: true
   authorizationMode: Webhook
+  tlsCipherSuites:
+    - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
 kops_default_kubeControllerManager:
   enableProfiling: false
+  terminatedPodGCThreshold: 12500
+  tlsCipherSuites:
+    - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
 kops_default_kubeScheduler:
   enableProfiling: false

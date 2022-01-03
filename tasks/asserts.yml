@@ -179,6 +179,20 @@
       {{ kops_default_kubelet }}
       {%- endif -%}
 
+- name: "({{ cluster.name }}) ensure kops_kubelet.tlsCipherSuites is list(string)"
+  assert:
+    that:
+      - item.tlsCipherSuites is defined
+      - item.tlsCipherSuites | type_debug == "list"
+    msg: "kops_kubelet.tlsCipherSuites should be list(string)"
+  with_items:
+    - >-
+      {%- if cluster.kops_kubelet is defined and 'tlsCipherSuites' in cluster.kops_kubelet -%}
+      {{ cluster.kops_kubelet }}
+      {%- else -%}
+      {{ kops_default_kubelet }}
+      {%- endif -%}
+
 - name: "({{ cluster.name }}) ensure kubeControllerManager.enableProfiling is boolean"
   assert:
     that:
@@ -189,6 +203,35 @@
     - >-
       {%- if cluster.kubeControllerManager is defined and 'enableProfiling' in cluster.kubeControllerManager -%}
       {{ cluster.kubeControllerManager }}
+      {%- else -%}
+      {{ kops_default_kubeControllerManager }}
+      {%- endif -%}
+
+- name: "({{ cluster.name }}) ensure kube_controller_manager.terminatedPodGCThreshold is larger or equal to 0"
+  assert:
+    that:
+      - item.terminatedPodGCThreshold is defined
+      - item.terminatedPodGCThreshold >= 0
+    msg: "kube_controller_manager.terminatedPodGCThreshold should >= 0"
+  with_items:
+    - >-
+      {%- if cluster.kube_controller_manager is defined and
+            'terminatedPodGCThreshold' in cluster.kube_controller_manager -%}
+      {{ cluster.kube_controller_manager }}
+      {%- else -%}
+      {{ kops_default_kubeControllerManager }}
+      {%- endif -%}
+
+- name: "({{ cluster.name }}) ensure kube_controller_manager.tlsCipherSuites is list(string)"
+  assert:
+    that:
+      - item.tlsCipherSuites is defined
+      - item.tlsCipherSuites | type_debug == "list"
+    msg: "kube_controller_manager.tlsCipherSuites should be list(string)"
+  with_items:
+    - >-
+      {%- if cluster.kube_controller_manager is defined and 'tlsCipherSuites' in cluster.kube_controller_manager -%}
+      {{ cluster.kube_controller_manager }}
       {%- else -%}
       {{ kops_default_kubeControllerManager }}
       {%- endif -%}
