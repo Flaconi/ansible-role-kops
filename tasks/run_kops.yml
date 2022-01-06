@@ -248,9 +248,10 @@
     if [ -n "${BOTO_PROFILE}" ]; then
       export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
     fi
+    # Don't fail to remove no exist secret
     kops delete secret secret dockerconfig \
       --state s3://{{ cluster.s3_bucket_name }} \
-      --name {{ cluster.name }}
+      --name {{ cluster.name }} || true
   args:
     executable: bash
   environment:
