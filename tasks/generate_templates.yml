@@ -16,6 +16,20 @@
     - encryption-config.yml
     - ssh-key.pub
 
+- name: "({{ cluster.name }}) verify kops_dockerconfig_creds for dockerhub"
+  uri:
+    url: "{{ kops_dockerconfig_creds.url | default(kops_default_dockerconfig_creds.url )}}"
+    user: "{{ kops_dockerconfig_creds.user }}"
+    password: "{{ kops_dockerconfig_creds.token }}"
+    force_basic_auth: true
+    timeout: 5
+  register: _kops_dockerconfig_login
+  failed_when: "'token' not in _kops_dockerconfig_login.json"
+  when: >
+    ( kops_dockerconfig_creds is defined ) and
+    ( 'user' in kops_dockerconfig_creds ) and
+    ( 'token' in kops_dockerconfig_creds )
+
 - name: "({{ cluster.name }}) generate shell scripts"
   template:
     src: "{{ item }}.j2"

@@ -114,3 +114,12 @@ kops_default_kubeControllerManager:
     - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
 kops_default_kubeScheduler:
   enableProfiling: false
+
+###
+### Verify dockerconfig via get ratelimited
+### https://docs.docker.com/docker-hub/download-rate-limit/#how-can-i-check-my-current-rate
+###
+kops_default_dockerconfig_creds:
+  url: 'https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull'
+  user: 'user'
+  token: 'token'

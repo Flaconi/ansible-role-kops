@@ -137,6 +137,22 @@
 ###
 ### Validate security setting
 ###
+- name: "({{ cluster.name }}) ensure kops_dockerconfig_creds format"
+  assert:
+    that:
+      - item.user is defined
+      - item.user | length > 0
+      - item.token is defined
+      - item.token | length > 0
+    msg: "kops_dockerconfig_creds should include user and token and validated in dockerhub"
+  with_items:
+    - >-
+      {%- if kops_dockerconfig_creds is defined -%}
+      {{ kops_dockerconfig_creds }}
+      {%- else -%}
+      {{ kops_default_dockerconfig_creds }}
+      {%- endif -%}
+
 - name: "({{ cluster.name }}) ensure kubelet.anonymousAuth is boolean"
   assert:
     that:

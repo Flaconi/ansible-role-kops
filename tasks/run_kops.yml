@@ -105,6 +105,37 @@
     - kops_update is defined
     - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 
+- name: "({{ cluster.name }}) generate dockerconfig creds variable"
+  set_fact:
+    _kops_dockerconfig: "{{ lookup('template', 'dockerconfig.json.j2') | to_nice_json(indent=2) | quote }}"
+  when:
+    - kops_dockerconfig_creds is defined
+
+- name: "({{ cluster.name }}) diff dockerconfig against remote state store"
+  udiff:
+    source: "{{ _kops_dockerconfig | default('') }}"
+    target: |
+      # If using boto_profile, make kops aware of it
+      if [ -n "${BOTO_PROFILE}" ]; then
+        export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
+      fi
+      # Don't fail to show that remote has nothing yet
+      _old_dockerconfig=`kops get secret dockerconfig --type secret -o plaintext \
+        --state s3://{{ cluster.s3_bucket_name }} \
+        --name {{ cluster.name }} 2>&1 \
+        | grep -ve "^$" | grep -v -e "Secret not found"` || true
+      echo -n "'$_old_dockerconfig'"
+    source_type: string
+    target_type: command
+    diff: raw
+  check_mode: False
+  register: _kops_diff_state_dockerconfig
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
 
 ###
 ### Update State Store
@@ -188,6 +219,45 @@
     BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
   when:
     - _kops_diff_state_sshkey['changed']
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+- name: "({{ cluster.name }}) update state store for secret dockerconfig"
+  shell: |
+    # If using boto_profile, make kops aware of it
+    if [ -n "${BOTO_PROFILE}" ]; then
+      export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
+    fi
+    kops create secret dockerconfig --force \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }} \
+      -f {{ kops_default_build_directory }}/{{ cluster.name }}/dockerconfig.json
+  args:
+    executable: bash
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - _kops_diff_state_dockerconfig['changed']
+    - kops_dockerconfig_creds is defined
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+- name: "({{ cluster.name }}) delete state store for secret dockerconfig"
+  shell: |
+    # If using boto_profile, make kops aware of it
+    if [ -n "${BOTO_PROFILE}" ]; then
+      export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
+    fi
+    kops delete secret secret dockerconfig \
+      --state s3://{{ cluster.s3_bucket_name }} \
+      --name {{ cluster.name }}
+  args:
+    executable: bash
+  environment:
+    BOTO_PROFILE: "{{ kops_aws_profile | default('') }}"
+  when:
+    - kops_dockerconfig_creds is not defined
+    - _kops_diff_state_dockerconfig['changed']
     - kops_update is defined
     - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
 

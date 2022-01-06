@@ -1,0 +1,7 @@
+{
+  "auths": {
+    "https://index.docker.io/v1/": {
+      "auth": "{{( kops_dockerconfig_creds.user + ":" + kops_dockerconfig_creds.token ) | b64encode }}"
+    }
+  }
+}
