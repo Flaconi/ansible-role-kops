@@ -22,7 +22,7 @@
     user: "{{ kops_dockerconfig_creds.user }}"
     password: "{{ kops_dockerconfig_creds.token }}"
     force_basic_auth: true
-    timeout: 5
+    timeout: "{{ kops_dockerconfig_creds.timeout | default(kops_default_dockerconfig_creds.timeout )}}"
   register: _kops_dockerconfig_login
   failed_when: "'token' not in _kops_dockerconfig_login.json"
   when: >

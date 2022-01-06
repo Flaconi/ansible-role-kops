@@ -121,5 +121,6 @@ kops_default_kubeScheduler:
 ###
 kops_default_dockerconfig_creds:
   url: 'https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull'
+  timeout: 5
   user: 'user'
   token: 'token'
