@@ -124,7 +124,9 @@
         --state s3://{{ cluster.s3_bucket_name }} \
         --name {{ cluster.name }} 2>&1 \
         | grep -ve "^$" | grep -v -e "Secret not found"` || true
-      echo -n "'$_old_dockerconfig'"
+      if [ "$_old_dockerconfig" != "" ]; then
+        echo -n "'$_old_dockerconfig'"
+      fi
     source_type: string
     target_type: command
     diff: raw
