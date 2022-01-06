@@ -30,6 +30,17 @@
     ( 'user' in kops_dockerconfig_creds ) and
     ( 'token' in kops_dockerconfig_creds )
 
+- name: "({{ cluster.name }}) generate dockerhub credential for kubernetes"
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/{{ item }}"
+    mode: 0644
+  loop:
+    - dockerconfig.json
+  when: >
+    ( 'skipped' not in _kops_dockerconfig_login ) or
+    ( _kops_dockerconfig_login.changed and not _kops_dockerconfig_login.failed )
+
 - name: "({{ cluster.name }}) generate shell scripts"
   template:
     src: "{{ item }}.j2"
