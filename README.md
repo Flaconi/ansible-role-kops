@@ -104,7 +104,8 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 | `kops_default_build_directory`               | `build`        | Template generation directory |
 | `kops_default_aws_account_limit`             | `[]`           | Limit generated cluster shell scripts to only run for the specified accounts to prevent accidental roll-out in wrong environment. |
 | `kops_default_aws_iam_authenticator_enabled` | `false`        | Enable AWS IAM authenticator |
-| `kops_default_dockerconfig` | `[`<br/>`url:'https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull',`<br/>`timeout: 5,`<br/>`user: 'user',`<br/>`token: 'token'`<br/>`]`| Define a sample dockerconfig then create it in secret, please notice that user and token are sample values here, please create `kops_dockerconfig_creds` to overwrite it|
+| `kops_default_dockerconfig` | `[`<br/>`url:'https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull',`<br/>`timeout: 5,`<br/>`]`| Define a general setting for dockerhub registry, then create `kops_dockerconfig_creds` in vault|
+| `kops_dockerconfig_creds` | `[url: 'URL', timeout, 'TIMEOUT', user: 'USER', token: 'TOKEN']`| Please use a valid user and token to login dockerhub, otherwise replace URL to your private registry.<br/>url and timeout are optional|
 
 ## Example definition
 

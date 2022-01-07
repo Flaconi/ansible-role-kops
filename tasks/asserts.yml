@@ -145,13 +145,9 @@
       - item.token is defined
       - item.token | length > 0
     msg: "kops_dockerconfig_creds should include user and token and validated in dockerhub"
-  with_items:
-    - >-
-      {%- if kops_dockerconfig_creds is defined -%}
-      {{ kops_dockerconfig_creds }}
-      {%- else -%}
-      {{ kops_default_dockerconfig }}
-      {%- endif -%}
+  loop:
+    - kops_dockerconfig_creds
+  when: kops_dockerconfig_creds is defined
 
 - name: "({{ cluster.name }}) ensure kubelet.anonymousAuth is boolean"
   assert:
