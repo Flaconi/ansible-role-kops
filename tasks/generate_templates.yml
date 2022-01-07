@@ -16,6 +16,40 @@
     - encryption-config.yml
     - ssh-key.pub
 
+- name: "({{ cluster.name }}) verify kops_dockerconfig_creds for dockerhub"
+  uri:
+    url: "{{ kops_dockerconfig_creds.url | default(kops_default_dockerconfig.url )}}"
+    user: "{{ kops_dockerconfig_creds.user }}"
+    password: "{{ kops_dockerconfig_creds.token }}"
+    force_basic_auth: true
+    timeout: "{{ kops_dockerconfig_creds.timeout | default(kops_default_dockerconfig.timeout )}}"
+  register: _kops_dockerconfig_login
+  failed_when: "'token' not in _kops_dockerconfig_login.json"
+  when: >
+    ( kops_dockerconfig_creds is defined ) and
+    ( 'user' in kops_dockerconfig_creds ) and
+    ( 'token' in kops_dockerconfig_creds )
+
+- name: "({{ cluster.name }}) delete dockerconfig.json"
+  file:
+    state: absent
+    path: "{{ kops_default_build_directory}}/{{ cluster.name }}/dockerconfig.json"
+  when:
+    - kops_dockerconfig_creds is not defined
+    - kops_update is defined
+    - kops_update == 'state' or kops_update == 'update' or kops_update == 'all'
+
+- name: "({{ cluster.name }}) generate dockerhub credential for kubernetes"
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ kops_default_build_directory}}/{{ cluster.name }}/{{ item }}"
+    mode: 0644
+  loop:
+    - dockerconfig.json
+  when: >
+    ( 'skipped' not in _kops_dockerconfig_login ) or
+    ( _kops_dockerconfig_login.changed and not _kops_dockerconfig_login.failed )
+
 - name: "({{ cluster.name }}) generate shell scripts"
   template:
     src: "{{ item }}.j2"

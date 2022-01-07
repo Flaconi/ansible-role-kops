@@ -80,6 +80,14 @@ if [ "${RUN}" -eq "1" ]; then
 fi
 echo
 
+echo "Test ${SCRIPTPATH}/dockerconfig.json exist"
+if [ -f "${SCRIPTPATH}/dockerconfig.json" ]; then
+	echo "kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} dockerconfig -f ${SCRIPTPATH}/dockerconfig.json"
+	if [ "${RUN}" -eq "1" ]; then
+		kops create secret --state ${KOPS_STATE_STORE} --name ${NAME} dockerconfig -f "${SCRIPTPATH}/dockerconfig.json"
+	fi
+fi
+echo
 
 
 echo "#------------------------------------------------------------"
