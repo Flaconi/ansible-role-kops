@@ -146,7 +146,7 @@
       - item.token | length > 0
     msg: "kops_dockerconfig_creds should include user and token and validated in dockerhub"
   loop:
-    - kops_dockerconfig_creds
+    - "{{ kops_dockerconfig_creds }}"
   when: kops_dockerconfig_creds is defined
 
 - name: "({{ cluster.name }}) ensure kubelet.anonymousAuth is boolean"
