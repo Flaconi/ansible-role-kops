@@ -18,11 +18,11 @@
 
 - name: "({{ cluster.name }}) verify kops_dockerconfig_creds for dockerhub"
   uri:
-    url: "{{ kops_dockerconfig_creds.url | default(kops_default_dockerconfig_creds.url )}}"
+    url: "{{ kops_dockerconfig_creds.url | default(kops_default_dockerconfig.url )}}"
     user: "{{ kops_dockerconfig_creds.user }}"
     password: "{{ kops_dockerconfig_creds.token }}"
     force_basic_auth: true
-    timeout: "{{ kops_dockerconfig_creds.timeout | default(kops_default_dockerconfig_creds.timeout )}}"
+    timeout: "{{ kops_dockerconfig_creds.timeout | default(kops_default_dockerconfig.timeout )}}"
   register: _kops_dockerconfig_login
   failed_when: "'token' not in _kops_dockerconfig_login.json"
   when: >

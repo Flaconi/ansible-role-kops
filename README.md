@@ -104,6 +104,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 | `kops_default_build_directory`               | `build`        | Template generation directory |
 | `kops_default_aws_account_limit`             | `[]`           | Limit generated cluster shell scripts to only run for the specified accounts to prevent accidental roll-out in wrong environment. |
 | `kops_default_aws_iam_authenticator_enabled` | `false`        | Enable AWS IAM authenticator |
+| `kops_default_dockerconfig` | `[`<br/>`url:'https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull',`<br/>`timeout: 5,`<br/>`user: 'user',`<br/>`token: 'token'`<br/>`]`| Define a sample dockerconfig then create it in secret, please notice that user and token are sample values here, please create `kops_dockerconfig_creds` to overwrite it|
 
 ## Example definition
 
@@ -228,6 +229,13 @@ kops_cluster:
       enabled: true
       image: "<PROVIDER>/aws-encryption-provider"
       kms_id: "12345678-9abc-defg-hijk-000000000001"
+```
+
+ Credentials for login dockerhub registry in your vault, there is a task to verify your account. If this user is invalid, the task will fail on verification. If you don't need secret/dockerconfig anymore, you have to remove `kops_dockerconfig_creds` from your vault.
+```yml
+kops_dockerconfig_creds:
+  user: 'USER'
+  token: 'TOKEN'
 ```
 
 

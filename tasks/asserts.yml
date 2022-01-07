@@ -150,7 +150,7 @@
       {%- if kops_dockerconfig_creds is defined -%}
       {{ kops_dockerconfig_creds }}
       {%- else -%}
-      {{ kops_default_dockerconfig_creds }}
+      {{ kops_default_dockerconfig }}
       {%- endif -%}
 
 - name: "({{ cluster.name }}) ensure kubelet.anonymousAuth is boolean"

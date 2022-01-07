@@ -119,7 +119,7 @@ kops_default_kubeScheduler:
 ### Verify dockerconfig via get ratelimited
 ### https://docs.docker.com/docker-hub/download-rate-limit/#how-can-i-check-my-current-rate
 ###
-kops_default_dockerconfig_creds:
+kops_default_dockerconfig:
   url: 'https://auth.docker.io/token?service=registry.docker.io&scope=repository:ratelimitpreview/test:pull'
   timeout: 5
   user: 'user'
