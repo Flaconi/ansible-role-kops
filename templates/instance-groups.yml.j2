@@ -49,6 +49,14 @@ metadata:
   name: {{ worker.name }}
 spec:
   image: {{ cluster.image | default(kops_default_image) }}
+  additionalUserData:
+  - name: sysctl.sh
+    type: text/x-shellscript
+    content: |
+      #!/bin/sh
+      sysctl -w kernel.unprivileged_userns_clone=0
+      echo "kernel.unprivileged_userns_clone=0" >> \
+        /etc/sysctl.conf
   machineType: {{ machine_type }}
   maxSize: {{ max_size }}
   minSize: {{ min_size }}
@@ -101,6 +109,14 @@ metadata:
   name: master-{{ subnet.az }}
 spec:
   image: {{ cluster.image | default(kops_default_image) }}
+  additionalUserData:
+  - name: sysctl.sh
+    type: text/x-shellscript
+    content: |
+      #!/bin/sh
+      sysctl -w kernel.unprivileged_userns_clone=0
+      echo "kernel.unprivileged_userns_clone=0" >> \
+        /etc/sysctl.conf
   machineType: {% if 'master' in cluster and 'instance_type' in cluster.master %}{{ cluster.master.instance_type }}{% else %}{{ kops_default_master_instance_type }}{% endif %}
 
   maxSize: 1
