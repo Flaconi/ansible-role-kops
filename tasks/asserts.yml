@@ -94,7 +94,7 @@
   assert:
     that:
       - item.enabled is defined
-      - item.enabled | type_debug == 'bool'
+      - item.enabled is boolean
     msg: "enabled should be true or false"
   with_items:
     - >-
@@ -153,7 +153,7 @@
   assert:
     that:
       - item.anonymousAuth is defined
-      - item.anonymousAuth | type_debug == 'bool'
+      - item.anonymousAuth is boolean
     msg: "kubelet.anonymousAuth should be true or false"
   with_items:
     - >-
@@ -167,7 +167,7 @@
   assert:
     that:
       - item.authenticationTokenWebhook is defined
-      - item.authenticationTokenWebhook | type_debug == 'bool'
+      - item.authenticationTokenWebhook is boolean
     msg: "kubelet.authenticationTokenWebhook should be true or false"
   with_items:
     - >-
@@ -195,7 +195,7 @@
   assert:
     that:
       - item.tlsCipherSuites is defined
-      - item.tlsCipherSuites | type_debug == "list"
+      - item.tlsCipherSuites is sequence
     msg: "kops_kubelet.tlsCipherSuites should be list(string)"
   with_items:
     - >-
@@ -209,7 +209,7 @@
   assert:
     that:
       - item.enableProfiling is defined
-      - item.enableProfiling | type_debug == 'bool'
+      - item.enableProfiling is boolean
     msg: "kubeControllerManager.enableProfiling should be true or false"
   with_items:
     - >-
@@ -238,7 +238,7 @@
   assert:
     that:
       - item.tlsCipherSuites is defined
-      - item.tlsCipherSuites | type_debug == "list"
+      - item.tlsCipherSuites is iterable
     msg: "kube_controller_manager.tlsCipherSuites should be list(string)"
   with_items:
     - >-
@@ -252,7 +252,7 @@
   assert:
     that:
       - item.enableProfiling is defined
-      - item.enableProfiling | type_debug == 'bool'
+      - item.enableProfiling is boolean
     msg: "kubeScheduler.enableProfiling should be true or false"
   with_items:
     - >-

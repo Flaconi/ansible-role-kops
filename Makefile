@@ -15,6 +15,7 @@ help:
 
 test:
 	docker run --rm --pull=always \
+	  --network=host \
 		-v ${PWD}:/etc/ansible/roles/rolename \
 		--workdir /etc/ansible/roles/rolename/tests \
 		flaconi/ansible:${ANSIBLE_VERSION} ./support/run-tests.sh
