@@ -6,7 +6,7 @@ galaxy_info:
   author: Patrick Plocke
   license: Apache 2.0
   description: Create customized KOPS (Kubernetes) templates.
-  min_ansible_version: 2.8
+  min_ansible_version: 2.9
   platforms:
     - name: all
       versions:

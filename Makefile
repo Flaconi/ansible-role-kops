@@ -1,7 +1,7 @@
 ###
 ### Variables
 ###
-ANSIBLE_VERSION=2.8
+ANSIBLE_VERSION=2.9
 
 
 ###
