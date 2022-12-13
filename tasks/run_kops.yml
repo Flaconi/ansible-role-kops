@@ -91,7 +91,7 @@
         export AWS_PROFILE="{{ kops_aws_profile | default('') }}";
       fi
       # Don't fail to show that remote has nothing yet
-      kops get secret admin --type SSHPublicKey -o table \
+      kops get sshpublickey \
         --state s3://{{ cluster.s3_bucket_name }} \
         --name {{ cluster.name }} \
         | grep -Eo "[:a-f0-9]{16,}" || true

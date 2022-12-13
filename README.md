@@ -19,9 +19,9 @@ This Ansible role is tagged according to the latest compatible (and tested by us
 
 ## Requirements
 
-* Ansible 2.8
+* Ansible 2.9
 * Python lib: [pyaml](https://github.com/yaml/pyyaml)
-* Binary: [kops](https://github.com/kubernetes/kops/blob/master/docs/install.md)
+* Binary: [kops](https://github.com/kubernetes/kops/blob/master/docs/install.md) 1.22+
 
 ## Run-time variables
 
