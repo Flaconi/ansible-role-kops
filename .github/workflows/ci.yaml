@@ -3,20 +3,25 @@ name: CI build
 on: [push]
 
 jobs:
-  ci_test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@master
+        uses: actions/checkout@v3
 
       - name: Lint Files
         run: |
           make lint
 
-      - name: Test Asserts with sample value ansible=2.8
-        run: |
-          make test
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [2.8 latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Test Asserts with sample value ansible=latest
+      - name: Test Asserts with for ansible=${{ matrix.version }}
         run: |
-          make test ANSIBLE_VERSION=latest
+          make test ANSIBLE_VERSION=${{ matrix.version }}
